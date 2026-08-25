@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vade - Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',sans-serif; background:#050505; color:#fff; display:flex; min-height:100vh; }
+
+        /* Sidebar */
+        .db-sidebar { width:220px; flex-shrink:0; background:#0a0a0a; border-right:1px solid #1a1a1a; display:flex; flex-direction:column; position:fixed; top:0; left:0; height:100vh; z-index:100; }
+        .db-logo { display:flex; align-items:center; gap:10px; padding:20px; border-bottom:1px solid #1a1a1a; text-decoration:none; }
+        .db-logo-icon { width:28px; height:28px; background:#8b5cf6; border-radius:7px; display:flex; align-items:center; justify-content:center; color:#fff; flex-shrink:0; }
+        .db-logo span { font-size:1rem; font-weight:700; color:#fff; }
+        .db-nav { flex:1; padding:12px 10px; display:flex; flex-direction:column; gap:2px; }
+        .db-nav-btn { display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:8px; color:#666; font-size:0.875rem; font-weight:500; text-decoration:none; cursor:pointer; border:none; background:none; width:100%; text-align:left; transition:background 0.15s,color 0.15s; font-family:'Inter',sans-serif; }
+        .db-nav-btn:hover { background:rgba(255,255,255,0.05); color:#ccc; }
+        .db-nav-btn.active { background:rgba(139,92,246,0.12); color:#fff; }
+        .db-nav-btn.active svg { color:#8b5cf6; opacity:1; }
+        .db-nav-btn svg { opacity:0.5; flex-shrink:0; }
+        .db-divider { height:1px; background:#1a1a1a; margin:6px 0; }
+        .db-footer { padding:12px 10px; border-top:1px solid #1a1a1a; }
+        .db-user-row { display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:8px; margin-bottom:4px; }
+        .db-user-av { width:30px; height:30px; border-radius:50%; overflow:hidden; background:rgba(139,92,246,0.2); border:1px solid rgba(139,92,246,0.3); display:flex; align-items:center; justify-content:center; flex-shrink:0; color:#8b5cf6; }
+        .db-user-av img { width:100%; height:100%; object-fit:cover; }
+        .db-user-info { display:flex; flex-direction:column; min-width:0; }
+        .db-user-name { font-size:0.82rem; font-weight:600; color:#fff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:110px; }
+        .db-user-role { font-size:0.7rem; color:#555; }
+        .db-logout { display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:8px; color:#ef4444; font-size:0.875rem; font-weight:500; cursor:pointer; border:none; background:none; width:100%; font-family:'Inter',sans-serif; transition:background 0.15s; }
+        .db-logout:hover { background:rgba(239,68,68,0.08); color:#f87171; }
+
+        /* Main */
+        .db-main { margin-left:220px; flex:1; }
+        .db-topbar { height:52px; border-bottom:1px solid #1a1a1a; display:flex; align-items:center; padding:0 28px; background:#050505; position:sticky; top:0; z-index:50; }
+        .db-topbar h1 { font-size:0.95rem; font-weight:600; color:#fff; }
+        .db-content { padding:28px; display:flex; flex-direction:column; gap:20px; max-width:860px; }
+
+        /* Cards */
+        .db-card { background:#0d0d0d; border:1px solid #1a1a1a; border-radius:12px; overflow:hidden; }
+        .db-card-head { padding:18px 20px 0; }
+        .db-card-title { font-size:0.95rem; font-weight:600; color:#fff; margin-bottom:4px; }
+        .db-card-sub { font-size:0.8rem; color:#555; padding-bottom:16px; }
+        .db-card-body { padding:18px 20px; }
+
+        /* Profile */
+        .db-profile-row { display:flex; align-items:center; gap:16px; padding-bottom:18px; }
+        .db-profile-av { width:64px; height:64px; border-radius:50%; overflow:hidden; background:rgba(139,92,246,0.15); border:2px solid rgba(139,92,246,0.3); display:flex; align-items:center; justify-content:center; flex-shrink:0; color:#8b5cf6; }
+        .db-profile-av img { width:100%; height:100%; object-fit:cover; }
+        .db-profile-name { font-size:1.2rem; font-weight:700; color:#fff; }
+        .db-profile-tag { font-size:0.82rem; color:#555; margin-top:2px; }
+
+        /* Info grid */
+        .db-info-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:#1a1a1a; border-radius:8px; overflow:hidden; }
+        .db-info-box { background:#0d0d0d; padding:14px 16px; }
+        .db-info-label { font-size:0.65rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:#444; margin-bottom:6px; }
+        .db-info-value { font-size:0.88rem; font-weight:600; color:#fff; word-break:break-all; }
+
+        /* Discord row */
+        .dc-row { display:flex; align-items:center; gap:14px; padding:14px 16px; background:#0a0a0a; border:1px solid #1a1a1a; border-radius:10px; }
+        .dc-av { width:40px; height:40px; border-radius:50%; overflow:hidden; background:rgba(88,101,242,0.15); border:1px solid rgba(88,101,242,0.3); display:flex; align-items:center; justify-content:center; flex-shrink:0; color:#5865f2; }
+        .dc-av img { width:100%; height:100%; object-fit:cover; }
+        .dc-info { flex:1; }
+        .dc-name { font-size:0.9rem; font-weight:600; color:#fff; }
+        .dc-id { font-size:0.75rem; color:#555; margin-top:2px; }
+        .dc-unlink { background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); color:#ef4444; font-size:0.8rem; font-weight:600; padding:7px 16px; border-radius:7px; cursor:pointer; font-family:'Inter',sans-serif; transition:background 0.2s; }
+        .dc-unlink:hover { background:rgba(239,68,68,0.2); }
+        .dc-link-btn { display:inline-flex; align-items:center; gap:8px; background:rgba(88,101,242,0.12); border:1px solid rgba(88,101,242,0.3); color:#8b9cf8; font-size:0.85rem; font-weight:600; padding:10px 18px; border-radius:8px; text-decoration:none; transition:background 0.2s; }
+        .dc-link-btn:hover { background:rgba(88,101,242,0.22); color:#fff; }
+
+        /* Pages */
+        .db-page { display:none; }
+        .db-page.active { display:block; }
+        .db-coming { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:60px 20px; text-align:center; gap:12px; }
+        .db-coming svg { color:#333; }
+        .db-coming h3 { font-size:1rem; font-weight:600; color:#666; }
+        .db-coming p { font-size:0.85rem; color:#444; }
+
+        /* Password form */
+        .pw-label { display:block; font-size:0.82rem; font-weight:600; color:#fff; margin-bottom:6px; }
+        .pw-input { width:100%; background:#0a0a0a; border:1px solid #222; color:#fff; padding:10px 14px; border-radius:8px; font-family:'Inter',sans-serif; font-size:0.9rem; outline:none; }
+        .pw-input:focus { border-color:#8b5cf6; }
+        .pw-btn { background:#8b5cf6; color:#fff; border:none; padding:11px 20px; border-radius:8px; font-size:0.9rem; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; transition:background 0.2s; }
+        .pw-btn:hover { background:#7c3aed; }
+    </style>
+</head>
+<body>
+
+<aside class="db-sidebar">
+    <a href="/" class="db-logo">
+        <div class="db-logo-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+        <span>Vade</span>
+    </a>
+    <nav class="db-nav">
+        <button class="db-nav-btn active" data-page="account">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Account</span>
+        </button>
+        <button class="db-nav-btn" data-page="subscriptions">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            <span>Subscriptions</span>
+        </button>
+        <button class="db-nav-btn" data-page="loader">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>Loader</span>
+        </button>
+        <button class="db-nav-btn" data-page="password">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span>Password</span>
+        </button>
+        <div class="db-divider"></div>
+        <a href="/" class="db-nav-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Home</span>
+        </a>
+    </nav>
+    <div class="db-footer">
+        <div class="db-user-row">
+            <div class="db-user-av" id="sb-av">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div class="db-user-info">
+                <span class="db-user-name" id="sb-name">Loading...</span>
+                <span class="db-user-role">User</span>
+            </div>
+        </div>
+        <button class="db-logout" id="btn-logout">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <span>Logout</span>
+        </button>
+    </div>
+</aside>
+
+<main class="db-main">
+    <div class="db-topbar"><h1 id="page-title">Account</h1></div>
+    <div class="db-content">
+
+        <!-- Account page -->
+        <div class="db-page active" id="page-account">
+            <div class="db-card">
+                <div class="db-card-body">
+                    <div class="db-profile-row">
+                        <div class="db-profile-av" id="profile-av">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        </div>
+                        <div>
+                            <div class="db-profile-name" id="profile-name">Loading...</div>
+                            <div class="db-profile-tag" id="profile-tag">Loading...</div>
+                        </div>
+                    </div>
+                    <div class="db-info-grid">
+                        <div class="db-info-box"><div class="db-info-label">Username</div><div class="db-info-value" id="info-user">—</div></div>
+                        <div class="db-info-box"><div class="db-info-label">User ID</div><div class="db-info-value" id="info-id" style="font-size:0.75rem;">—</div></div>
+                        <div class="db-info-box"><div class="db-info-label">Member Since</div><div class="db-info-value" id="info-since">—</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="db-card">
+                <div class="db-card-head">
+                    <div class="db-card-title">Discord Account</div>
+                    <div class="db-card-sub">Verified and linked to your Vade account.</div>
+                </div>
+                <div class="db-card-body" id="dc-body">
+                    <p style="color:#555;font-size:0.85rem;">Loading...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subscriptions page -->
+        <div class="db-page" id="page-subscriptions">
+            <div class="db-card"><div class="db-coming">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                <h3>Subscriptions</h3><p>Your active subscriptions will appear here.</p>
+            </div></div>
+        </div>
+
+        <!-- Loader page -->
+        <div class="db-page" id="page-loader">
+            <div class="db-card"><div class="db-coming">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <h3>Loader / Download</h3><p>Download links for your products will appear here.</p>
+            </div></div>
+        </div>
+
+        <!-- Password page -->
+        <div class="db-page" id="page-password">
+            <div class="db-card">
+                <div class="db-card-head">
+                    <div class="db-card-title">Change Password</div>
+                    <div class="db-card-sub">Update your account password.</div>
+                </div>
+                <div class="db-card-body">
+                    <form id="pw-form" style="display:flex;flex-direction:column;gap:16px;max-width:400px;">
+                        <div><label class="pw-label">Current Password</label><input type="password" id="pw-cur" class="pw-input" placeholder="••••••••"></div>
+                        <div><label class="pw-label">New Password</label><input type="password" id="pw-new" class="pw-input" placeholder="••••••••"></div>
+                        <button type="submit" class="pw-btn">Update Password</button>
+                        <p id="pw-msg" style="font-size:0.82rem;display:none;"></p>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<script>
+(function () {
+    var token = localStorage.getItem('vade_token');
+
+    function decodeToken(t) {
+        try {
+            var b64 = t.split('.')[0];
+            return JSON.parse(atob(b64.replace(/-/g, '+').replace(/_/g, '/')));
+        } catch (e) { return null; }
+    }
+
+    if (!token) {
+        window.location.href = '/login';
+        return;
+    }
+
+    var payload = decodeToken(token);
+    if (!payload || !payload.username) {
+        localStorage.removeItem('vade_token');
+        window.location.href = '/login';
+        return;
+    }
+
+    // Check token not expired (30 days)
+    if (payload.ts && (Date.now() / 1000) - payload.ts > 86400 * 30) {
+        localStorage.removeItem('vade_token');
+        window.location.href = '/login';
+        return;
+    }
+
+    // Populate sidebar immediately from token
+    document.getElementById('sb-name').textContent = payload.username;
+    if (payload.avatar && payload.user_id && !payload.user_id.startsWith('local:')) {
+        document.getElementById('sb-av').innerHTML = '<img src="https://cdn.discordapp.com/avatars/' + payload.user_id + '/' + payload.avatar + '.png?size=64" alt="av" />';
+    }
+
+    // Load full data from server
+    fetch('/api/dashboard', {
+        headers: { 'Authorization': 'Bearer ' + token }
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+        if (!d.ok) {
+            // Only redirect if truly not authenticated (401), not just missing data
+            console.error('Dashboard API error:', d.error);
+            return;
+        }
+
+        // Profile
+        if (d.avatar_url) {
+            document.getElementById('profile-av').innerHTML = '<img src="' + d.avatar_url + '" alt="av" />';
+            document.getElementById('sb-av').innerHTML = '<img src="' + d.avatar_url + '" alt="av" />';
+        }
+        document.getElementById('profile-name').textContent = d.username;
+        document.getElementById('profile-tag').textContent = d.is_linked ? 'Discord Verified' : 'Link your Discord to complete setup';
+        document.getElementById('sb-name').textContent = d.username;
+        document.getElementById('info-user').textContent = d.username;
+        var displayId = d.discord_id.startsWith('local:') ? 'Not linked yet' : d.discord_id;
+        document.getElementById('info-id').textContent = displayId;
+
+        if (d.verified_at) {
+            var dt = new Date(d.verified_at * 1000);
+            document.getElementById('info-since').textContent = dt.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        }
+
+        // Discord card
+        var dcBody = document.getElementById('dc-body');
+        if (d.is_linked) {
+            var av = d.avatar_url
+                ? '<img src="' + d.avatar_url + '" alt="dc" />'
+                : '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.79 19.79 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.865-.608 1.25-1.845-.277-3.68-.277-5.487 0-.163-.393-.406-.874-.618-1.25a.077.077 0 00-.079-.037 19.74 19.74 0 00-4.885 1.515.07.07 0 00-.032.028C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 13.276 13.276 0 003.995 2.02.078.078 0 00.084-.028c.462-.63.873-1.295 1.226-1.994a.076.076 0 00-.042-.106 8.875 8.875 0 01-1.248-.595.077.077 0 01-.02-.128c.126-.094.252-.192.372-.291a.074.074 0 01.078-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 01.079.01c.12.098.245.197.373.292a.077.077 0 01-.006.127 8.254 8.254 0 01-1.249.594.05.05 0 00-.03.03.052.052 0 00.003.041c.36.698.772 1.362 1.225 1.993a.077.077 0 00.084.028 13.235 13.235 0 004.001-2.02.049.049 0 00.021-.037c.334-3.451-.559-6.449-3.549-13.66a.061.061 0 00-.031-.03z"/></svg>';
+            dcBody.innerHTML = '<div class="dc-row"><div class="dc-av">' + av + '</div><div class="dc-info"><div class="dc-name">' + d.username + '</div><div class="dc-id">Discord ID: ' + d.discord_id + '</div></div><button class="dc-unlink" id="btn-unlink">Unlink</button></div>';
+        } else {
+            dcBody.innerHTML = '<p style="color:#555;font-size:0.85rem;margin-bottom:14px;">No Discord account linked yet.</p><a href="/auth/discord" class="dc-link-btn">Link Discord Account</a>';
+        }
+    })
+    .catch(function (err) {
+        console.error('Dashboard error:', err);
+        document.getElementById('profile-name').textContent = 'Failed to load';
+        document.getElementById('profile-tag').textContent = 'Check your connection';
+    });
+
+    // Nav switching
+    document.querySelectorAll('.db-nav-btn[data-page]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            document.querySelectorAll('.db-nav-btn').forEach(function (b) { b.classList.remove('active'); });
+            document.querySelectorAll('.db-page').forEach(function (p) { p.classList.remove('active'); });
+            btn.classList.add('active');
+            var pg = document.getElementById('page-' + btn.dataset.page);
+            if (pg) pg.classList.add('active');
+            document.getElementById('page-title').textContent = btn.querySelector('span').textContent;
+        });
+    });
+
+    // Logout
+    document.getElementById('btn-logout').addEventListener('click', function () {
+        localStorage.removeItem('vade_token');
+        fetch('/logout', { credentials: 'include' }).catch(function() {});
+        window.location.href = '/login';
+    });
+
+    // Password form
+    var pwForm = document.getElementById('pw-form');
+    if (pwForm) {
+        pwForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            var msg = document.getElementById('pw-msg');
+            var res = await fetch('/api/change-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                body: JSON.stringify({ current: document.getElementById('pw-cur').value, new_password: document.getElementById('pw-new').value })
+            });
+            var data = await res.json();
+            msg.style.display = 'block';
+            msg.style.color = data.ok ? '#10b981' : '#ef4444';
+            msg.textContent = data.ok ? 'Password updated.' : (data.error || 'Failed.');
+        });
+    }
+
+})();
+</script>
+
+</body>
+</html>
