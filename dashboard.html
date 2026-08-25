@@ -207,87 +207,26 @@
     </div>
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script src="supabase-client.js"></script>
 <script>
-(function () {
-    var token = localStorage.getItem('vade_token');
+(async function () {
+    var sb = window.supabaseClient;
+    var session = null;
 
-    function decodeToken(t) {
-        try {
-            var b64 = t.split('.')[0];
-            return JSON.parse(atob(b64.replace(/-/g, '+').replace(/_/g, '/')));
-        } catch (e) { return null; }
-    }
-
-    if (!token) {
-        window.location.href = '/login';
+    // Check session — redirect to login if none
+    var result = await sb.auth.getSession();
+    session = result.data.session;
+    if (!session) {
+        window.location.href = 'login.html';
         return;
     }
 
-    var payload = decodeToken(token);
-    if (!payload || !payload.username) {
-        localStorage.removeItem('vade_token');
-        window.location.href = '/login';
-        return;
-    }
+    var user = session.user;
 
-    // Check token not expired (30 days)
-    if (payload.ts && (Date.now() / 1000) - payload.ts > 86400 * 30) {
-        localStorage.removeItem('vade_token');
-        window.location.href = '/login';
-        return;
-    }
-
-    // Populate sidebar immediately from token
-    document.getElementById('sb-name').textContent = payload.username;
-    if (payload.avatar && payload.user_id && !payload.user_id.startsWith('local:')) {
-        document.getElementById('sb-av').innerHTML = '<img src="https://cdn.discordapp.com/avatars/' + payload.user_id + '/' + payload.avatar + '.png?size=64" alt="av" />';
-    }
-
-    // Load full data from server
-    fetch('/api/dashboard', {
-        headers: { 'Authorization': 'Bearer ' + token }
-    })
-    .then(function (r) { return r.json(); })
-    .then(function (d) {
-        if (!d.ok) {
-            // Only redirect if truly not authenticated (401), not just missing data
-            console.error('Dashboard API error:', d.error);
-            return;
-        }
-
-        // Profile
-        if (d.avatar_url) {
-            document.getElementById('profile-av').innerHTML = '<img src="' + d.avatar_url + '" alt="av" />';
-            document.getElementById('sb-av').innerHTML = '<img src="' + d.avatar_url + '" alt="av" />';
-        }
-        document.getElementById('profile-name').textContent = d.username;
-        document.getElementById('profile-tag').textContent = d.is_linked ? 'Discord Verified' : 'Link your Discord to complete setup';
-        document.getElementById('sb-name').textContent = d.username;
-        document.getElementById('info-user').textContent = d.username;
-        var displayId = d.discord_id.startsWith('local:') ? 'Not linked yet' : d.discord_id;
-        document.getElementById('info-id').textContent = displayId;
-
-        if (d.verified_at) {
-            var dt = new Date(d.verified_at * 1000);
-            document.getElementById('info-since').textContent = dt.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-        }
-
-        // Discord card
-        var dcBody = document.getElementById('dc-body');
-        if (d.is_linked) {
-            var av = d.avatar_url
-                ? '<img src="' + d.avatar_url + '" alt="dc" />'
-                : '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.79 19.79 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.865-.608 1.25-1.845-.277-3.68-.277-5.487 0-.163-.393-.406-.874-.618-1.25a.077.077 0 00-.079-.037 19.74 19.74 0 00-4.885 1.515.07.07 0 00-.032.028C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 13.276 13.276 0 003.995 2.02.078.078 0 00.084-.028c.462-.63.873-1.295 1.226-1.994a.076.076 0 00-.042-.106 8.875 8.875 0 01-1.248-.595.077.077 0 01-.02-.128c.126-.094.252-.192.372-.291a.074.074 0 01.078-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 01.079.01c.12.098.245.197.373.292a.077.077 0 01-.006.127 8.254 8.254 0 01-1.249.594.05.05 0 00-.03.03.052.052 0 00.003.041c.36.698.772 1.362 1.225 1.993a.077.077 0 00.084.028 13.235 13.235 0 004.001-2.02.049.049 0 00.021-.037c.334-3.451-.559-6.449-3.549-13.66a.061.061 0 00-.031-.03z"/></svg>';
-            dcBody.innerHTML = '<div class="dc-row"><div class="dc-av">' + av + '</div><div class="dc-info"><div class="dc-name">' + d.username + '</div><div class="dc-id">Discord ID: ' + d.discord_id + '</div></div><button class="dc-unlink" id="btn-unlink">Unlink</button></div>';
-        } else {
-            dcBody.innerHTML = '<p style="color:#555;font-size:0.85rem;margin-bottom:14px;">No Discord account linked yet.</p><a href="/auth/discord" class="dc-link-btn">Link Discord Account</a>';
-        }
-    })
-    .catch(function (err) {
-        console.error('Dashboard error:', err);
-        document.getElementById('profile-name').textContent = 'Failed to load';
-        document.getElementById('profile-tag').textContent = 'Check your connection';
-    });
+    // Populate sidebar immediately
+    document.getElementById('sb-name').textContent = user.user_metadata.username || user.email;
 
     // Nav switching
     document.querySelectorAll('.db-nav-btn[data-page]').forEach(function (btn) {
@@ -302,11 +241,43 @@
     });
 
     // Logout
-    document.getElementById('btn-logout').addEventListener('click', function () {
-        localStorage.removeItem('vade_token');
-        fetch('/logout', { credentials: 'include' }).catch(function() {});
-        window.location.href = '/login';
+    document.getElementById('btn-logout').addEventListener('click', async function () {
+        await sb.auth.signOut();
+        window.location.href = 'login.html';
     });
+
+    // Load profile from Supabase
+    var { data: profile } = await sb
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+    if (profile) {
+        document.getElementById('profile-name').textContent = profile.username;
+        document.getElementById('sb-name').textContent = profile.username;
+        document.getElementById('info-user').textContent = profile.username;
+
+        if (profile.discord_id) {
+            var displayId = profile.discord_id.startsWith('local:') ? 'Not linked yet' : profile.discord_id;
+            document.getElementById('info-id').textContent = displayId;
+            document.getElementById('profile-tag').textContent = 'Discord Verified';
+
+            var dcBody = document.getElementById('dc-body');
+            var avUrl = profile.avatar
+                ? 'https://cdn.discordapp.com/avatars/' + profile.discord_id + '/' + profile.avatar + '.png?size=64'
+                : '';
+            var av = avUrl
+                ? '<img src="' + avUrl + '" alt="dc" />'
+                : '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.79 19.79 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.865-.608 1.25-1.845-.277-3.68-.277-5.487 0-.163-.393-.406-.874-.618-1.25a.077.077 0 00-.079-.037A19.74 19.74 0 00.495 4.37a.07.07 0 00-.032.028C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 13.276 13.276 0 003.995 2.02.078.078 0 00.084-.028c.462-.63.873-1.295 1.226-1.994a.076.076 0 00-.042-.106 8.875 8.875 0 01-1.248-.595.077.077 0 01-.02-.128c.126-.094.252-.192.372-.291a.074.074 0 01.078-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 01.079.01c.12.098.245.197.373.292a.077.077 0 01-.006.127 8.254 8.254 0 01-1.249.594.05.05 0 00-.03.03.052.052 0 00.003.041c.36.698.772 1.362 1.225 1.993a.077.077 0 00.084.028 13.235 13.235 0 004.001-2.02.049.049 0 00.021-.037c.334-3.451-.559-6.449-3.549-13.66a.061.061 0 00-.031-.03z"/></svg>';
+            dcBody.innerHTML = '<div class="dc-row"><div class="dc-av">' + av + '</div><div class="dc-info"><div class="dc-name">' + profile.username + '</div><div class="dc-id">Discord ID: ' + profile.discord_id + '</div></div><button class="dc-unlink" id="btn-unlink">Unlink</button></div>';
+        } else {
+            document.getElementById('profile-tag').textContent = 'Link your Discord to complete setup';
+        }
+    }
+
+    var created = new Date(user.created_at);
+    document.getElementById('info-since').textContent = created.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
     // Password form
     var pwForm = document.getElementById('pw-form');
@@ -314,18 +285,16 @@
         pwForm.addEventListener('submit', async function (e) {
             e.preventDefault();
             var msg = document.getElementById('pw-msg');
-            var res = await fetch('/api/change-password', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                body: JSON.stringify({ current: document.getElementById('pw-cur').value, new_password: document.getElementById('pw-new').value })
+            var { error } = await sb.auth.updateUser({
+                password: document.getElementById('pw-new').value
             });
-            var data = await res.json();
             msg.style.display = 'block';
-            msg.style.color = data.ok ? '#10b981' : '#ef4444';
-            msg.textContent = data.ok ? 'Password updated.' : (data.error || 'Failed.');
+            msg.style.color = error ? '#ef4444' : '#10b981';
+            msg.textContent = error ? (error.message || 'Failed.') : 'Password updated.';
+            document.getElementById('pw-cur').value = '';
+            document.getElementById('pw-new').value = '';
         });
     }
-
 })();
 </script>
 

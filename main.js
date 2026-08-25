@@ -113,32 +113,25 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ── User Auth State — Sign In button → User dropdown when logged in ──
-    fetch('/api/me')
-        .then(res => res.json())
-        .then(data => {
-            const loginBtn = document.getElementById('discord-login-btn');
+    var sb = window.supabaseClient;
+    if (sb) {
+        sb.auth.getSession().then(function (result) {
+            var session = result.data.session;
+            var loginBtn = document.getElementById('discord-login-btn');
             if (!loginBtn) return;
 
-            if (data.logged_in) {
-                // Build avatar URL — Discord CDN for Discord users, blank for local accounts
-                const avatarUrl = (data.avatar && data.discord_id && !data.discord_id.startsWith('local:'))
-                    ? `https://cdn.discordapp.com/avatars/${data.discord_id}/${data.avatar}.png?size=64`
-                    : null;
+            if (session) {
+                var user = session.user;
+                var displayName = user.user_metadata.username || user.email;
 
-                const displayName = data.username || 'Account';
-
-                // Replace the plain <a> button with a dropdown wrapper
-                const wrapper = document.createElement('div');
+                var wrapper = document.createElement('div');
                 wrapper.className = 'user-dropdown';
                 wrapper.id = 'user-dropdown';
 
                 wrapper.innerHTML = `
                     <button class="user-dropdown-trigger" aria-expanded="false" aria-haspopup="true">
                         <div class="user-avatar">
-                            ${avatarUrl
-                                ? `<img src="${avatarUrl}" alt="${displayName}" />`
-                                : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`
-                            }
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                         </div>
                         <span class="user-display-name">${displayName}</span>
                         <svg class="user-dropdown-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
@@ -146,15 +139,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="user-dropdown-menu" role="menu">
                         <div class="user-dropdown-header">
                             <div class="user-dropdown-avatar">
-                                ${avatarUrl
-                                    ? `<img src="${avatarUrl}" alt="${displayName}" />`
-                                    : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`
-                                }
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                             </div>
                             <span class="user-dropdown-name">${displayName}</span>
                         </div>
                         <div class="user-dropdown-divider"></div>
-                        <a href="/dashboard.html" class="user-dropdown-item" role="menuitem">
+                        <a href="dashboard.html" class="user-dropdown-item" role="menuitem">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                             Dashboard
                         </a>
@@ -167,45 +157,49 @@ document.addEventListener('DOMContentLoaded', () => {
                             Download
                         </a>
                         <div class="user-dropdown-divider"></div>
-                        <a href="/logout" class="user-dropdown-item user-dropdown-logout" role="menuitem">
+                        <a href="#" class="user-dropdown-item user-dropdown-logout" role="menuitem" id="nav-logout">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                             Logout
                         </a>
                     </div>
                 `;
 
-                // Replace the sign-in button with the dropdown
                 loginBtn.parentNode.replaceChild(wrapper, loginBtn);
 
-                // Toggle dropdown on button click
-                const trigger = wrapper.querySelector('.user-dropdown-trigger');
-                const menu = wrapper.querySelector('.user-dropdown-menu');
+                var trigger = wrapper.querySelector('.user-dropdown-trigger');
+                var menu = wrapper.querySelector('.user-dropdown-menu');
 
-                trigger.addEventListener('click', (e) => {
+                trigger.addEventListener('click', function (e) {
                     e.stopPropagation();
-                    const isOpen = wrapper.classList.contains('open');
+                    var isOpen = wrapper.classList.contains('open');
                     wrapper.classList.toggle('open', !isOpen);
                     trigger.setAttribute('aria-expanded', String(!isOpen));
                 });
 
-                // Close on outside click
-                document.addEventListener('click', (e) => {
+                document.addEventListener('click', function (e) {
                     if (!wrapper.contains(e.target)) {
                         wrapper.classList.remove('open');
                         trigger.setAttribute('aria-expanded', 'false');
                     }
                 });
 
-                // Close on Escape
-                document.addEventListener('keydown', (e) => {
+                document.addEventListener('keydown', function (e) {
                     if (e.key === 'Escape') {
                         wrapper.classList.remove('open');
                         trigger.setAttribute('aria-expanded', 'false');
                     }
                 });
+
+                wrapper.querySelector('#nav-logout').addEventListener('click', async function (e) {
+                    e.preventDefault();
+                    await sb.auth.signOut();
+                    window.location.href = 'login.html';
+                });
             }
-        })
-        .catch(err => console.error('Error checking login status:', err));
+        }).catch(function (err) {
+            console.error('Error checking login status:', err);
+        });
+    }
 
     // ── Support Dropdown Toggle (click for mobile) ──
     const supportDropdown = document.querySelector('.dropdown');

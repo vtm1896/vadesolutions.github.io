@@ -85,6 +85,9 @@
         </div>
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="config.js"></script>
+    <script src="supabase-client.js"></script>
     <script src="main.js"></script>
     <script>
         // ── Password toggle ──
@@ -147,39 +150,66 @@
             submitBtn.disabled = true;
             submitBtn.textContent = 'Creating account…';
 
-            const payload = {
-                license_key: document.getElementById('license-key').value.trim(),
-                email:       document.getElementById('email').value.trim(),
-                username:    document.getElementById('username').value.trim(),
-                password:    document.getElementById('password').value,
-            };
+            const licenseKey = document.getElementById('license-key').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
 
-            try {
-                const res = await fetch('/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                });
-                const data = await res.json();
-                if (data.ok) {
-                    // Append token to redirect URL so SellAuth can pick it up cross-domain
-                    const dest = data.redirect || '/';
-                    const url = data.token
-                        ? dest + (dest.includes('?') ? '&' : '?') + 'vade_token=' + encodeURIComponent(data.token)
-                        : dest;
-                    window.location.href = url;
-                } else {
-                    errorBox.textContent = data.error || 'Something went wrong.';
-                    errorBox.style.display = 'block';
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Create account →';
-                }
-            } catch (err) {
-                errorBox.textContent = 'Network error. Please try again.';
+            const sb = window.supabaseClient;
+
+            // Validate license key
+            const { data: keyData, error: keyErr } = await sb
+                .from('license_keys')
+                .select('*')
+                .eq('key', licenseKey)
+                .eq('used', false)
+                .single();
+
+            if (keyErr || !keyData) {
+                errorBox.textContent = 'Invalid or already used license key.';
                 errorBox.style.display = 'block';
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'Create account →';
+                submitBtn.textContent = 'Create account \u2192';
+                return;
             }
+
+            // Check username not taken
+            const { data: existing } = await sb
+                .from('profiles')
+                .select('id')
+                .eq('username', username)
+                .maybeSingle();
+
+            if (existing) {
+                errorBox.textContent = 'That username is already taken.';
+                errorBox.style.display = 'block';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create account \u2192';
+                return;
+            }
+
+            // Sign up with Supabase Auth
+            const { data, error } = await sb.auth.signUp({
+                email,
+                password,
+                options: { data: { username } }
+            });
+
+            if (error) {
+                errorBox.textContent = error.message || 'Something went wrong.';
+                errorBox.style.display = 'block';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create account \u2192';
+                return;
+            }
+
+            // Mark license key as used
+            await sb
+                .from('license_keys')
+                .update({ used: true, used_by: data.user.id })
+                .eq('id', keyData.id);
+
+            window.location.href = 'dashboard.html';
         });
     </script>
 </body>
