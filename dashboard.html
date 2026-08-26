@@ -247,8 +247,12 @@
         .eq('id', user.id)
         .single();
 
-    // Try to get Discord info from API
-    var discordInfo = null;
+    var displayName = profile ? profile.username : user.user_metadata.username || user.email;
+    var discordId = (profile && profile.discord_id) || null;
+    var avatarHash = (profile && profile.avatar) || null;
+    var dcUsername = (profile && profile.discord_username) || null;
+
+    // Also try to get from API if provider_token available (to keep info fresh)
     var providerToken = session.provider_token;
     if (providerToken) {
         try {
@@ -256,22 +260,19 @@
                 headers: { 'Authorization': 'Bearer ' + providerToken }
             });
             if (dcRes.ok) {
-                discordInfo = await dcRes.json();
-                // Update profile with latest Discord info
+                var discordInfo = await dcRes.json();
+                discordId = discordInfo.id;
+                avatarHash = discordInfo.avatar || null;
+                dcUsername = discordInfo.username || dcUsername;
                 await sb.from('profiles').upsert({
                     id: user.id,
                     discord_id: discordInfo.id,
                     avatar: discordInfo.avatar || null,
-                    username: profile ? profile.username : (user.user_metadata.username || discordInfo.username)
+                    discord_username: discordInfo.username || null
                 }, { onConflict: 'id' });
             }
         } catch (e) {}
     }
-
-    var displayName = profile ? profile.username : user.user_metadata.username || user.email;
-    var discordId = (discordInfo && discordInfo.id) || (profile && profile.discord_id) || null;
-    var avatarHash = (discordInfo && discordInfo.avatar) || (profile && profile.avatar) || null;
-    var dcUsername = (discordInfo && discordInfo.username) || null;
 
     // Build avatar URL
     var avatarUrl = null;

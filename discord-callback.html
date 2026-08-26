@@ -67,7 +67,8 @@
                     id: user.id,
                     discord_id: discordUser.id,
                     avatar: discordUser.avatar || null,
-                    username: user.user_metadata.username || discordUser.username
+                    username: user.user_metadata.username || discordUser.username,
+                    discord_username: discordUser.username || null
                 }, { onConflict: 'id' });
 
                 window.location.href = 'dashboard.html';
