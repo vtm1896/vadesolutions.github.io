@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vade - Discord</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="login-body">
+    <div class="login-grid-bg"></div>
+    <main class="login-main fade-in-up">
+        <div class="login-header">
+            <div class="login-logo-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            </div>
+            <span class="login-logo-text">Vade</span>
+        </div>
+        <div class="login-card" style="text-align:center;">
+            <p style="color:#888;font-size:0.9rem;margin-bottom:16px;">Checking your Discord status...</p>
+            <div id="status-msg" style="color:#fff;font-size:0.95rem;"></div>
+        </div>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="config.js"></script>
+    <script src="supabase-client.js"></script>
+    <script>
+    (async function () {
+        var sb = window.supabaseClient;
+        var GUILD_ID = '1490213290113241169';
+        var statusMsg = document.getElementById('status-msg');
+
+        var { data, error } = await sb.auth.getSession();
+        var session = data.session;
+
+        if (!session) {
+            statusMsg.textContent = 'Not authenticated. Redirecting...';
+            window.location.href = 'login.html';
+            return;
+        }
+
+        var providerToken = session.provider_token;
+
+        if (!providerToken) {
+            statusMsg.textContent = 'No Discord token found. Trying login...';
+            window.location.href = 'login.html';
+            return;
+        }
+
+        try {
+            var guildsRes = await fetch('https://discord.com/api/v10/users/@me/guilds', {
+                headers: { 'Authorization': 'Bearer ' + providerToken }
+            });
+            var guilds = await guildsRes.json();
+
+            var isInServer = guilds.some(function (g) { return g.id === GUILD_ID; });
+
+            if (isInServer) {
+                var user = session.user;
+                var discordUser = await fetch('https://discord.com/api/v10/users/@me', {
+                    headers: { 'Authorization': 'Bearer ' + providerToken }
+                }).then(function (r) { return r.json(); });
+
+                await sb.from('profiles').upsert({
+                    id: user.id,
+                    discord_id: discordUser.id,
+                    avatar: discordUser.avatar || null,
+                    username: user.user_metadata.username || discordUser.username
+                }, { onConflict: 'id' });
+
+                window.location.href = 'dashboard.html';
+            } else {
+                await sb.auth.signOut();
+                window.location.href = 'join-discord.html';
+            }
+        } catch (e) {
+            statusMsg.textContent = 'Error checking Discord. Please try again.';
+        }
+    })();
+    </script>
+</body>
+</html>
