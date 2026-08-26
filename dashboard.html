@@ -212,20 +212,15 @@
 <script>
 (async function () {
     var sb = window.supabaseClient;
-    var session = null;
 
-    // Check session — redirect to login if none
     var result = await sb.auth.getSession();
-    session = result.data.session;
+    var session = result.data.session;
     if (!session) {
         window.location.href = 'login.html';
         return;
     }
 
     var user = session.user;
-
-    // Populate sidebar immediately
-    document.getElementById('sb-name').textContent = user.user_metadata.username || user.email;
 
     // Nav switching
     document.querySelectorAll('.db-nav-btn[data-page]').forEach(function (btn) {
@@ -245,38 +240,107 @@
         window.location.href = 'login.html';
     });
 
-    // Load profile from Supabase
+    // Load profile
     var { data: profile } = await sb
         .from('profiles')
         .select('*')
         .eq('id', user.id)
         .single();
 
-    if (profile) {
-        document.getElementById('profile-name').textContent = profile.username;
-        document.getElementById('sb-name').textContent = profile.username;
-        document.getElementById('info-user').textContent = profile.username;
-
-        if (profile.discord_id) {
-            var displayId = profile.discord_id.startsWith('local:') ? 'Not linked yet' : profile.discord_id;
-            document.getElementById('info-id').textContent = displayId;
-            document.getElementById('profile-tag').textContent = 'Discord Verified';
-
-            var dcBody = document.getElementById('dc-body');
-            var avUrl = profile.avatar
-                ? 'https://cdn.discordapp.com/avatars/' + profile.discord_id + '/' + profile.avatar + '.png?size=64'
-                : '';
-            var av = avUrl
-                ? '<img src="' + avUrl + '" alt="dc" />'
-                : '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.79 19.79 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.865-.608 1.25-1.845-.277-3.68-.277-5.487 0-.163-.393-.406-.874-.618-1.25a.077.077 0 00-.079-.037A19.74 19.74 0 00.495 4.37a.07.07 0 00-.032.028C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 13.276 13.276 0 003.995 2.02.078.078 0 00.084-.028c.462-.63.873-1.295 1.226-1.994a.076.076 0 00-.042-.106 8.875 8.875 0 01-1.248-.595.077.077 0 01-.02-.128c.126-.094.252-.192.372-.291a.074.074 0 01.078-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 01.079.01c.12.098.245.197.373.292a.077.077 0 01-.006.127 8.254 8.254 0 01-1.249.594.05.05 0 00-.03.03.052.052 0 00.003.041c.36.698.772 1.362 1.225 1.993a.077.077 0 00.084.028 13.235 13.235 0 004.001-2.02.049.049 0 00.021-.037c.334-3.451-.559-6.449-3.549-13.66a.061.061 0 00-.031-.03z"/></svg>';
-            dcBody.innerHTML = '<div class="dc-row"><div class="dc-av">' + av + '</div><div class="dc-info"><div class="dc-name">' + profile.username + '</div><div class="dc-id">Discord ID: ' + profile.discord_id + '</div></div><button class="dc-unlink" id="btn-unlink">Unlink</button></div>';
-        } else {
-            document.getElementById('profile-tag').textContent = 'Link your Discord to complete setup';
-        }
+    // Try to get Discord info from API
+    var discordInfo = null;
+    var providerToken = session.provider_token;
+    if (providerToken) {
+        try {
+            var dcRes = await fetch('https://discord.com/api/v10/users/@me', {
+                headers: { 'Authorization': 'Bearer ' + providerToken }
+            });
+            if (dcRes.ok) {
+                discordInfo = await dcRes.json();
+                // Update profile with latest Discord info
+                await sb.from('profiles').upsert({
+                    id: user.id,
+                    discord_id: discordInfo.id,
+                    avatar: discordInfo.avatar || null,
+                    username: profile ? profile.username : (user.user_metadata.username || discordInfo.username)
+                }, { onConflict: 'id' });
+            }
+        } catch (e) {}
     }
 
+    var displayName = profile ? profile.username : user.user_metadata.username || user.email;
+    var discordId = (discordInfo && discordInfo.id) || (profile && profile.discord_id) || null;
+    var avatarHash = (discordInfo && discordInfo.avatar) || (profile && profile.avatar) || null;
+    var dcUsername = (discordInfo && discordInfo.username) || null;
+
+    // Build avatar URL
+    var avatarUrl = null;
+    if (discordId && avatarHash) {
+        var ext = avatarHash.startsWith('a_') ? 'gif' : 'png';
+        avatarUrl = 'https://cdn.discordapp.com/avatars/' + discordId + '/' + avatarHash + '.' + ext + '?size=128';
+    }
+
+    // Sidebar avatar
+    if (avatarUrl) {
+        document.getElementById('sb-av').innerHTML = '<img src="' + avatarUrl + '" alt="av" />';
+    }
+
+    // Sidebar name
+    document.getElementById('sb-name').textContent = displayName;
+
+    // Profile card
+    if (avatarUrl) {
+        document.getElementById('profile-av').innerHTML = '<img src="' + avatarUrl + '" alt="av" />';
+    }
+    document.getElementById('profile-name').textContent = displayName;
+    document.getElementById('info-user').textContent = displayName;
+
+    if (discordId) {
+        document.getElementById('profile-tag').textContent = 'Discord Verified';
+        document.getElementById('info-id').textContent = discordId;
+    } else {
+        document.getElementById('profile-tag').textContent = 'Link your Discord to complete setup';
+        document.getElementById('info-id').textContent = 'Not linked';
+    }
+
+    // Member since
     var created = new Date(user.created_at);
     document.getElementById('info-since').textContent = created.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+    // Discord Account card
+    var dcBody = document.getElementById('dc-body');
+    if (discordId && dcUsername) {
+        var avHtml = avatarUrl
+            ? '<img src="' + avatarUrl + '" alt="dc" />'
+            : '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.79 19.79 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.865-.608 1.25-1.845-.277-3.68-.277-5.487 0-.163-.393-.406-.874-.618-1.25a.077.077 0 00-.079-.037A19.74 19.74 0 00.495 4.37a.07.07 0 00-.032.028C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057c2.053 1.508 4.041 2.423 5.993 3.029a.078.078 0 00.084-.028c.462-.63.873-1.295 1.226-1.994a.076.076 0 00-.042-.106c-.653-.248-1.274-.55-1.872-.892a.077.077 0 01-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 01.078-.011c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 01.079.01c.12.098.245.197.373.292a.077.077 0 01-.006.127 12.3 12.3 0 01-1.873.892.076.076 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028c1.961-.607 3.95-1.522 6.002-3.029a.077.077 0 00.032-.055c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.029zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>';
+
+        dcBody.innerHTML =
+            '<div class="dc-row">' +
+                '<div class="dc-av">' + avHtml + '</div>' +
+                '<div class="dc-info">' +
+                    '<div class="dc-name">' + dcUsername + '</div>' +
+                    '<div class="dc-id">Discord ID: ' + discordId + '</div>' +
+                '</div>' +
+                '<button class="dc-unlink" id="btn-unlink">Unlink</button>' +
+            '</div>';
+
+        document.getElementById('btn-unlink').addEventListener('click', async function () {
+            await sb.from('profiles').update({ discord_id: null, avatar: null }).eq('id', user.id);
+            window.location.reload();
+        });
+    } else {
+        dcBody.innerHTML = '<p style="color:#555;font-size:0.85rem;margin-bottom:14px;">No Discord account linked yet.</p><a href="#" class="dc-link-btn" id="btn-link-dc"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.79 19.79 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.865-.608 1.25-1.845-.277-3.68-.277-5.487 0-.163-.393-.406-.874-.618-1.25a.077.077 0 00-.079-.037A19.74 19.74 0 00.495 4.37a.07.07 0 00-.032.028C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057c2.053 1.508 4.041 2.423 5.993 3.029a.078.078 0 00.084-.028c.462-.63.873-1.295 1.226-1.994a.076.076 0 00-.042-.106c-.653-.248-1.274-.55-1.872-.892a.077.077 0 01-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 01.078-.011c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 01.079.01c.12.098.245.197.373.292a.077.077 0 01-.006.127 12.3 12.3 0 01-1.873.892.076.076 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028c1.961-.607 3.95-1.522 6.002-3.029a.077.077 0 00.032-.055c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.029z"/></svg> Link Discord Account</a>';
+        document.getElementById('btn-link-dc').addEventListener('click', function (e) {
+            e.preventDefault();
+            sb.auth.signInWithOAuth({
+                provider: 'discord',
+                options: {
+                    redirectTo: window.location.origin + '/discord-callback.html',
+                    scopes: 'identify guilds'
+                }
+            });
+        });
+    }
 
     // Password form
     var pwForm = document.getElementById('pw-form');
@@ -290,7 +354,6 @@
             msg.style.display = 'block';
             msg.style.color = error ? '#ef4444' : '#10b981';
             msg.textContent = error ? (error.message || 'Failed.') : 'Password updated.';
-            document.getElementById('pw-cur').value = '';
             document.getElementById('pw-new').value = '';
         });
     }
