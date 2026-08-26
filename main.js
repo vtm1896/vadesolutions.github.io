@@ -115,14 +115,35 @@ document.addEventListener('DOMContentLoaded', () => {
     // ── User Auth State — Sign In button → User dropdown when logged in ──
     var sb = window.supabaseClient;
     if (sb) {
-        sb.auth.getSession().then(function (result) {
+        sb.auth.getSession().then(async function (result) {
             var session = result.data.session;
             var loginBtn = document.getElementById('discord-login-btn');
             if (!loginBtn) return;
 
             if (session) {
                 var user = session.user;
-                var displayName = user.user_metadata.username || user.email;
+
+                // Fetch profile from Supabase for Discord info
+                var { data: profile } = await sb
+                    .from('profiles')
+                    .select('username, discord_id, avatar')
+                    .eq('id', user.id)
+                    .maybeSingle();
+
+                var displayName = (profile && profile.username) || user.user_metadata.username || user.email;
+                var avatarUrl = null;
+                if (profile && profile.discord_id && profile.avatar) {
+                    var ext = profile.avatar.startsWith('a_') ? 'gif' : 'png';
+                    avatarUrl = 'https://cdn.discordapp.com/avatars/' + profile.discord_id + '/' + profile.avatar + '.' + ext + '?size=64';
+                }
+
+                var avatarHtml = avatarUrl
+                    ? '<img src="' + avatarUrl + '" alt="' + displayName + '" />'
+                    : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+
+                var avatarHtmlLarge = avatarUrl
+                    ? '<img src="' + avatarUrl + '" alt="' + displayName + '" />'
+                    : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
 
                 var wrapper = document.createElement('div');
                 wrapper.className = 'user-dropdown';
@@ -131,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 wrapper.innerHTML = `
                     <button class="user-dropdown-trigger" aria-expanded="false" aria-haspopup="true">
                         <div class="user-avatar">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            ${avatarHtml}
                         </div>
                         <span class="user-display-name">${displayName}</span>
                         <svg class="user-dropdown-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
@@ -139,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="user-dropdown-menu" role="menu">
                         <div class="user-dropdown-header">
                             <div class="user-dropdown-avatar">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                ${avatarHtmlLarge}
                             </div>
                             <span class="user-dropdown-name">${displayName}</span>
                         </div>
