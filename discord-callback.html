@@ -63,13 +63,19 @@
                     headers: { 'Authorization': 'Bearer ' + providerToken }
                 }).then(function (r) { return r.json(); });
 
-                await sb.from('profiles').upsert({
+                var { error: upsertErr } = await sb.from('profiles').upsert({
                     id: user.id,
                     discord_id: discordUser.id,
                     avatar: discordUser.avatar || null,
                     username: user.user_metadata.username || discordUser.username,
                     discord_username: discordUser.username || null
                 }, { onConflict: 'id' });
+
+                if (upsertErr) {
+                    console.error('Discord upsert error:', upsertErr);
+                    statusMsg.textContent = 'Error saving Discord info: ' + upsertErr.message;
+                    return;
+                }
 
                 window.location.href = 'dashboard.html';
             } else {
@@ -81,5 +87,7 @@
         }
     })();
     </script>
+    <script src="logo-data.js"></script>
+    <script src="logo-replace.js"></script>
 </body>
 </html>

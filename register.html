@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vade - Create Account</title>
-    <meta name="description" content="Create your Vade account using your license key.">
+    <meta name="description" content="Create your Vade account.">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,22 +31,6 @@
             <p class="login-subtitle">Already have an account? <a href="login.html">Log in here</a></p>
 
             <form class="login-form" id="register-form" novalidate>
-
-                <!-- License Key -->
-                <div class="form-group">
-                    <label for="license-key">License key <span class="required">*</span></label>
-                    <input
-                        type="text"
-                        id="license-key"
-                        name="license_key"
-                        placeholder="XXXX-XXX-XXX-XXX-XXX"
-                        maxlength="19"
-                        autocomplete="off"
-                        spellcheck="false"
-                        required
-                    >
-                    <p class="form-hint">One account can be created from each unclaimed license key.</p>
-                </div>
 
                 <!-- Email + Username row -->
                 <div class="register-row">
@@ -80,8 +64,6 @@
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.79 19.79 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.865-.608 1.25-1.845-.277-3.68-.277-5.487 0-.163-.393-.406-.874-.618-1.25a.077.077 0 00-.079-.037A19.74 19.74 0 00.495 4.37a.07.07 0 00-.032.028C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057c2.053 1.508 4.041 2.423 5.993 3.029a.078.078 0 00.084-.028c.462-.63.873-1.295 1.226-1.994a.076.076 0 00-.042-.106c-.653-.248-1.274-.55-1.872-.892a.077.077 0 01-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 01.078-.011c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 01.079.01c.12.099.245.198.373.292a.077.077 0 01-.006.127 12.3 12.3 0 01-1.873.892.076.076 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028c1.961-.607 3.95-1.522 6.002-3.029a.077.077 0 00.032-.055c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.029zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
                 Continue with Discord
             </a>
-
-            <p class="register-browse-hint">Need a license? <a href="products.html">Browse products</a></p>
         </div>
     </main>
 
@@ -104,40 +86,7 @@
             eyeIcon.innerHTML = isPassword ? eyeClosed : eyeOpen;
         });
 
-        // ── License key auto-formatter: XXXX-XXX-XXX-XXX-XXX ──
-        const KEY_SEGMENTS = [4, 3, 3, 3, 3];
-        const licenseInput = document.getElementById('license-key');
-
-        function formatKey(raw) {
-            const clean = raw.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-            let result = '';
-            let pos = 0;
-            for (let i = 0; i < KEY_SEGMENTS.length; i++) {
-                const chunk = clean.slice(pos, pos + KEY_SEGMENTS[i]);
-                if (!chunk) break;
-                if (i > 0) result += '-';
-                result += chunk;
-                pos += KEY_SEGMENTS[i];
-            }
-            return result;
-        }
-
-        licenseInput.addEventListener('input', function () {
-            const cursorPos = this.selectionStart;
-            const oldVal = this.value;
-            const formatted = formatKey(this.value);
-            this.value = formatted;
-            const diff = formatted.length - oldVal.length;
-            try { this.setSelectionRange(cursorPos + diff, cursorPos + diff); } catch (_) {}
-        });
-
-        licenseInput.addEventListener('paste', function (e) {
-            e.preventDefault();
-            const pasted = (e.clipboardData || window.clipboardData).getData('text');
-            this.value = formatKey(pasted);
-        });
-
-        // ── Form submission → POST /register ──
+        // ── Form submission ──
         const form = document.getElementById('register-form');
         const submitBtn = form.querySelector('button[type="submit"]');
         const errorBox = document.createElement('p');
@@ -150,28 +99,11 @@
             submitBtn.disabled = true;
             submitBtn.textContent = 'Creating account…';
 
-            const licenseKey = document.getElementById('license-key').value.trim();
             const email = document.getElementById('email').value.trim();
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
 
             const sb = window.supabaseClient;
-
-            // Validate license key
-            const { data: keyData, error: keyErr } = await sb
-                .from('license_keys')
-                .select('*')
-                .eq('key', licenseKey)
-                .eq('used', false)
-                .single();
-
-            if (keyErr || !keyData) {
-                errorBox.textContent = 'Invalid or already used license key.';
-                errorBox.style.display = 'block';
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Create account \u2192';
-                return;
-            }
 
             // Check username not taken
             const { data: existing } = await sb
@@ -203,12 +135,6 @@
                 return;
             }
 
-            // Mark license key as used
-            await sb
-                .from('license_keys')
-                .update({ used: true, used_by: data.user.id })
-                .eq('id', keyData.id);
-
             window.location.href = 'dashboard.html';
         });
 
@@ -223,5 +149,7 @@
             });
         });
     </script>
+    <script src="logo-data.js"></script>
+    <script src="logo-replace.js"></script>
 </body>
 </html>

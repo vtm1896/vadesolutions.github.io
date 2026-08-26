@@ -223,16 +223,27 @@
     var user = session.user;
 
     // Nav switching
+    function switchPage(pageName) {
+        document.querySelectorAll('.db-nav-btn').forEach(function (b) { b.classList.remove('active'); });
+        document.querySelectorAll('.db-page').forEach(function (p) { p.classList.remove('active'); });
+        var btn = document.querySelector('.db-nav-btn[data-page="' + pageName + '"]');
+        if (btn) btn.classList.add('active');
+        var pg = document.getElementById('page-' + pageName);
+        if (pg) pg.classList.add('active');
+        document.getElementById('page-title').textContent = btn ? btn.querySelector('span').textContent : pageName;
+    }
+
     document.querySelectorAll('.db-nav-btn[data-page]').forEach(function (btn) {
         btn.addEventListener('click', function () {
-            document.querySelectorAll('.db-nav-btn').forEach(function (b) { b.classList.remove('active'); });
-            document.querySelectorAll('.db-page').forEach(function (p) { p.classList.remove('active'); });
-            btn.classList.add('active');
-            var pg = document.getElementById('page-' + btn.dataset.page);
-            if (pg) pg.classList.add('active');
-            document.getElementById('page-title').textContent = btn.querySelector('span').textContent;
+            switchPage(btn.dataset.page);
         });
     });
+
+    // Check hash for direct tab navigation (e.g., dashboard.html#subscriptions)
+    var hashPage = window.location.hash.replace('#', '');
+    if (hashPage && document.getElementById('page-' + hashPage)) {
+        switchPage(hashPage);
+    }
 
     // Logout
     document.getElementById('btn-logout').addEventListener('click', async function () {
@@ -264,12 +275,13 @@
                 discordId = discordInfo.id;
                 avatarHash = discordInfo.avatar || null;
                 dcUsername = discordInfo.username || dcUsername;
-                await sb.from('profiles').upsert({
+                var { error: dcUpsertErr } = await sb.from('profiles').upsert({
                     id: user.id,
                     discord_id: discordInfo.id,
                     avatar: discordInfo.avatar || null,
                     discord_username: discordInfo.username || null
                 }, { onConflict: 'id' });
+                if (dcUpsertErr) console.error('Dashboard Discord upsert error:', dcUpsertErr);
             }
         } catch (e) {}
     }
@@ -326,7 +338,8 @@
             '</div>';
 
         document.getElementById('btn-unlink').addEventListener('click', async function () {
-            await sb.from('profiles').update({ discord_id: null, avatar: null }).eq('id', user.id);
+            var { error: unErr } = await sb.from('profiles').update({ discord_id: null, avatar: null, discord_username: null }).eq('id', user.id);
+            if (unErr) console.error('Unlink error:', unErr);
             window.location.reload();
         });
     } else {
@@ -361,5 +374,7 @@
 })();
 </script>
 
+    <script src="logo-data.js"></script>
+    <script src="logo-replace.js"></script>
 </body>
 </html>
