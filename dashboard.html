@@ -84,8 +84,18 @@
         .pw-label { display:block; font-size:0.82rem; font-weight:600; color:#fff; margin-bottom:6px; }
         .pw-input { width:100%; background:#0a0a0a; border:1px solid #222; color:#fff; padding:10px 14px; border-radius:8px; font-family:'Inter',sans-serif; font-size:0.9rem; outline:none; }
         .pw-input:focus { border-color:#8b5cf6; }
-        .pw-btn { background:#8b5cf6; color:#fff; border:none; padding:11px 20px; border-radius:8px; font-size:0.9rem; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; transition:background 0.2s; }
+        .pw-btn { background:#8b5cf6; color:#fff; border:none; padding:11px 20px; border-radius:8px; font-size:0.9rem; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; transition:background 0.2s; white-space:nowrap; }
         .pw-btn:hover { background:#7c3aed; }
+
+        /* Subscriptions */
+        .sub-empty { text-align:center; padding:36px 20px; color:#555; font-size:0.88rem; background:#0a0a0a; border:1px solid #1a1a1a; border-radius:10px; margin-bottom:20px; }
+        .sub-redeem-label { display:block; font-size:0.7rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:#555; margin-bottom:8px; }
+        .sub-redeem-row { display:flex; gap:10px; }
+        .sub-redeem-row .pw-input { flex:1; }
+        .sub-license-row { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; background:#0a0a0a; border:1px solid #1a1a1a; border-radius:10px; margin-bottom:8px; }
+        .sub-license-key { font-size:0.85rem; font-weight:600; color:#fff; font-family:monospace; letter-spacing:0.05em; }
+        .sub-license-product { font-size:0.75rem; color:#555; margin-top:2px; }
+        .sub-license-active { display:inline-block; padding:3px 10px; border-radius:50px; font-size:0.72rem; font-weight:600; background:rgba(16,185,129,0.12); color:#10b981; border:1px solid rgba(16,185,129,0.25); }
     </style>
 </head>
 <body>
@@ -172,10 +182,24 @@
 
         <!-- Subscriptions page -->
         <div class="db-page" id="page-subscriptions">
-            <div class="db-card"><div class="db-coming">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-                <h3>Subscriptions</h3><p>Your active subscriptions will appear here.</p>
-            </div></div>
+            <div class="db-card">
+                <div class="db-card-head">
+                    <div class="db-card-title">Subscription & Licenses</div>
+                </div>
+                <div class="db-card-body">
+                    <div id="sub-licenses-list">
+                        <div class="sub-empty">No active licenses found on your account. Register a key below.</div>
+                    </div>
+                    <div class="sub-redeem">
+                        <label class="sub-redeem-label">REDEEM LICENSE KEY</label>
+                        <div class="sub-redeem-row">
+                            <input type="text" id="redeem-key" class="pw-input" placeholder="****-****-****-****" maxlength="19" spellcheck="false" autocomplete="off">
+                            <button type="button" id="redeem-btn" class="pw-btn">Redeem Key</button>
+                        </div>
+                        <p id="redeem-msg" style="font-size:0.82rem;display:none;margin-top:8px;"></p>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Loader page -->
@@ -369,6 +393,75 @@
             msg.style.color = error ? '#ef4444' : '#10b981';
             msg.textContent = error ? (error.message || 'Failed.') : 'Password updated.';
             document.getElementById('pw-new').value = '';
+        });
+    }
+
+    // License key formatter: ****-****-****-****
+    var redeemInput = document.getElementById('redeem-key');
+    if (redeemInput) {
+        redeemInput.addEventListener('input', function () {
+            var raw = this.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+            var result = '';
+            for (var i = 0; i < raw.length && i < 16; i++) {
+                if (i > 0 && i % 4 === 0) result += '-';
+                result += raw[i];
+            }
+            this.value = result;
+        });
+    }
+
+    // Redeem key button
+    var redeemBtn = document.getElementById('redeem-btn');
+    if (redeemBtn) {
+        redeemBtn.addEventListener('click', async function () {
+            var key = redeemInput.value.trim();
+            var msg = document.getElementById('redeem-msg');
+            if (!key) { msg.style.display='block'; msg.style.color='#ef4444'; msg.textContent='Enter a license key.'; return; }
+            redeemBtn.disabled = true;
+            redeemBtn.textContent = 'Redeeming...';
+
+            var { data: keyData, error: keyErr } = await sb
+                .from('license_keys')
+                .select('*')
+                .eq('key', key)
+                .eq('used', false)
+                .single();
+
+            if (keyErr || !keyData) {
+                msg.style.display = 'block'; msg.style.color = '#ef4444';
+                msg.textContent = 'Invalid or already used license key.';
+                redeemBtn.disabled = false; redeemBtn.textContent = 'Redeem Key';
+                return;
+            }
+
+            await sb.from('license_keys').update({ used: true, used_by: user.id }).eq('id', keyData.id);
+
+            msg.style.display = 'block'; msg.style.color = '#10b981';
+            msg.textContent = 'Key redeemed successfully!';
+            redeemBtn.disabled = false; redeemBtn.textContent = 'Redeem Key';
+            redeemInput.value = '';
+
+            var licensesList = document.getElementById('sub-licenses-list');
+            var emptyMsg = licensesList.querySelector('.sub-empty');
+            if (emptyMsg) emptyMsg.remove();
+            var row = document.createElement('div');
+            row.className = 'sub-license-row';
+            row.innerHTML = '<div><div class="sub-license-key">' + key + '</div><div class="sub-license-product">' + (keyData.product || 'Vade') + '</div></div><span class="sub-license-active">Active</span>';
+            licensesList.appendChild(row);
+        });
+    }
+
+    // Load existing licenses
+    var { data: userKeys } = await sb.from('license_keys').select('key, product').eq('used_by', user.id);
+    if (userKeys && userKeys.length > 0) {
+        var licensesList = document.getElementById('sub-licenses-list');
+        var emptyMsg = licensesList.querySelector('.sub-empty');
+        if (emptyMsg) emptyMsg.remove();
+        userKeys.forEach(function (k) {
+            var row = document.createElement('div');
+            row.className = 'sub-license-row';
+            row.innerHTML = '<div><div class="sub-license-key">' + k.key + '</div><div class="sub-license-product">' + (k.product || 'Vade') + '</div></div><span class="sub-license-active">Active</span>';
+            licensesList.appendChild(row);
         });
     }
 })();
