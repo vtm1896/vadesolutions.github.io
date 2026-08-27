@@ -14,10 +14,9 @@
 
     <main class="login-main fade-in-up">
         <div class="login-header">
-            <div class="login-logo-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-            </div>
-            <span class="login-logo-text">Vade</span>
+            <a href="index.html" class="logo">
+                <img src="" alt="Vade" class="logo-img" id="nav-logo">
+            </a>
         </div>
 
         <div class="login-card" style="text-align:center;">
@@ -27,5 +26,7 @@
             <a href="login.html" class="btn-login-submit" style="display:inline-block;text-decoration:none;">Log in &rarr;</a>
         </div>
     </main>
+    <script src="logo-data.js"></script>
+    <script>if(window.VADE_LOGO){var el=document.getElementById('nav-logo');if(el)el.src=window.VADE_LOGO;}</script>
 </body>
 </html>

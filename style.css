@@ -154,21 +154,13 @@ h1, h2, h3 {
     margin-right: 4px;
 }
 
-.logo-icon {
-    width: 32px;
-    height: 32px;
-    background: var(--accent-color);
-    border-radius: 9px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    flex-shrink: 0;
-    font-weight: 800;
-    font-size: 1rem;
+.logo-img {
+    height: 34px;
+    width: auto;
+    object-fit: contain;
 }
 
-.logo-icon svg {
+.logo-icon {
     display: none;
 }
 
@@ -1816,20 +1808,11 @@ footer {
 }
 
 .login-logo-icon {
-    width: 32px;
-    height: 32px;
-    background: var(--accent-color);
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
+    display: none;
 }
 
 .login-logo-text {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--text-primary);
+    display: none;
 }
 
 .login-card {

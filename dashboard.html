@@ -14,8 +14,9 @@
         /* Sidebar */
         .db-sidebar { width:220px; flex-shrink:0; background:#0a0a0a; border-right:1px solid #1a1a1a; display:flex; flex-direction:column; position:fixed; top:0; left:0; height:100vh; z-index:100; }
         .db-logo { display:flex; align-items:center; gap:10px; padding:20px; border-bottom:1px solid #1a1a1a; text-decoration:none; }
-        .db-logo-icon { width:28px; height:28px; background:#8b5cf6; border-radius:7px; display:flex; align-items:center; justify-content:center; color:#fff; flex-shrink:0; }
-        .db-logo span { font-size:1rem; font-weight:700; color:#fff; }
+        .db-logo-icon { display:none; }
+        .db-logo span { display:none; }
+        .db-logo .logo-img { height:32px; width:auto; object-fit:contain; }
         .db-nav { flex:1; padding:12px 10px; display:flex; flex-direction:column; gap:2px; }
         .db-nav-btn { display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:8px; color:#666; font-size:0.875rem; font-weight:500; text-decoration:none; cursor:pointer; border:none; background:none; width:100%; text-align:left; transition:background 0.15s,color 0.15s; font-family:'Inter',sans-serif; }
         .db-nav-btn:hover { background:rgba(255,255,255,0.05); color:#ccc; }
@@ -91,8 +92,7 @@
 
 <aside class="db-sidebar">
     <a href="/" class="db-logo">
-        <div class="db-logo-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
-        <span>Vade</span>
+        <img src="" alt="Vade" class="logo-img" id="nav-logo">
     </a>
     <nav class="db-nav">
         <button class="db-nav-btn active" data-page="account">
@@ -373,6 +373,8 @@
     }
 })();
 </script>
+    <script src="logo-data.js"></script>
+    <script>if(window.VADE_LOGO){var el=document.getElementById('nav-logo');if(el)el.src=window.VADE_LOGO;}</script>
 
 </body>
 </html>
