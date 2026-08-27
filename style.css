@@ -130,6 +130,7 @@ h1, h2, h3 {
     border-radius: 50px;
     padding: 0;
     box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+    overflow: visible;
 }
 
 .nav-container {
@@ -138,7 +139,6 @@ h1, h2, h3 {
     align-items: center;
     padding: 8px 10px 8px 16px;
     gap: 4px;
-    overflow: hidden;
 }
 
 .logo {
