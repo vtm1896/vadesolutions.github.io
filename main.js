@@ -123,14 +123,26 @@ document.addEventListener('DOMContentLoaded', () => {
             if (session) {
                 var user = session.user;
 
-                // Fetch profile from Supabase for Discord info
-                var { data: profile } = await sb
+                // Fetch profile from Supabase for Discord info + role
+                var { data: profile, error: profileErr } = await sb
                     .from('profiles')
-                    .select('username, discord_id, avatar')
+                    .select('username, discord_id, avatar, role')
                     .eq('id', user.id)
                     .maybeSingle();
+                if (profileErr) {
+                    // role column not added yet — retry without it
+                    var retry = await sb
+                        .from('profiles')
+                        .select('username, discord_id, avatar')
+                        .eq('id', user.id)
+                        .maybeSingle();
+                    profile = retry.data || null;
+                }
 
                 var displayName = (profile && profile.username) || user.user_metadata.username || user.email;
+                var userRole = (profile && profile.role) || 'customer';
+                var roleLabel = (window.VadeRoles && window.VadeRoles.LABELS[userRole]) || 'Customer';
+                var isStaff = window.VadeRoles ? window.VadeRoles.atLeast(userRole, 'staff') : false;
                 var avatarUrl = null;
                 if (profile && profile.discord_id && profile.avatar) {
                     var ext = profile.avatar.startsWith('a_') ? 'gif' : 'png';
@@ -144,6 +156,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 var avatarHtmlLarge = avatarUrl
                     ? '<img src="' + avatarUrl + '" alt="' + displayName + '" />'
                     : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+
+                var adminItemHtml = isStaff ? `
+                        <a href="admin.html" class="user-dropdown-item" role="menuitem">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                            Admin Panel
+                        </a>` : '';
 
                 var wrapper = document.createElement('div');
                 wrapper.className = 'user-dropdown';
@@ -162,7 +180,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="user-dropdown-avatar">
                                 ${avatarHtmlLarge}
                             </div>
-                            <span class="user-dropdown-name">${displayName}</span>
+                            <div class="user-dropdown-header-text">
+                                <span class="user-dropdown-name">${displayName}</span>
+                                <span class="user-role-badge role-${userRole}">${roleLabel}</span>
+                            </div>
                         </div>
                         <div class="user-dropdown-divider"></div>
                         <a href="dashboard.html" class="user-dropdown-item" role="menuitem">
@@ -177,6 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                             Download
                         </a>
+                        ${adminItemHtml}
                         <div class="user-dropdown-divider"></div>
                         <a href="#" class="user-dropdown-item user-dropdown-logout" role="menuitem" id="nav-logout">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
