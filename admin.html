@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Vade - Admin Panel</title>
-    <link rel="icon" type="image/png" href="NEW_VADE_LOGO-removebg-preview.png?v=7">
+    <link rel="icon" type="image/png" href="NEW_VADE_LOGO-removebg-preview.png?v=8">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Vade">
     <meta property="og:title" content="Vade - Admin Panel">
@@ -16,20 +16,69 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=7">
+    <link rel="stylesheet" href="style.css?v=8">
     <style>
-        .admin-shell { max-width: 860px; margin: 0 auto; padding: 120px 20px 80px; }
-        .admin-head { margin-bottom: 28px; }
-        .admin-head h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 6px; }
-        .admin-head p { color: var(--text-secondary); font-size: 0.95rem; }
-        .admin-me { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; background: #0d0d0d; border: 1px solid var(--border-color); border-radius: 999px; padding: 6px 14px 6px 8px; font-size: 0.82rem; color: var(--text-secondary); }
+        .admin-shell { max-width: 1060px; margin: 0 auto; padding: 120px 20px 80px; }
+
+        /* Sidebar layout */
+        .admin-layout { display: grid; grid-template-columns: 232px 1fr; gap: 26px; align-items: start; }
+        .admin-side { position: sticky; top: 100px; background: #0d0d0d; border: 1px solid var(--border-color); border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 3px; }
+        .admin-side-brand { display: flex; align-items: center; gap: 9px; font-weight: 700; font-size: 0.95rem; padding: 6px 10px 14px; border-bottom: 1px solid var(--border-color); margin-bottom: 8px; letter-spacing: -0.02em; }
+        .admin-side-brand .brand-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-color); box-shadow: 0 0 10px var(--accent-color); flex-shrink: 0; }
+        .admin-nav { display: flex; flex-direction: column; gap: 3px; }
+        .admin-nav-btn { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: transparent; border: none; color: var(--text-secondary); font-family: var(--font-main); font-size: 0.88rem; font-weight: 600; padding: 10px 12px; border-radius: 9px; cursor: pointer; transition: background 0.15s, color 0.15s; }
+        .admin-nav-btn:hover { background: rgba(255,255,255,0.04); color: var(--text-primary); }
+        .admin-nav-btn.active { background: rgba(139,92,246,0.12); color: #fff; }
+        .admin-nav-btn.active svg { color: var(--accent-color); opacity: 1; }
+        .admin-nav-btn svg { opacity: 0.6; flex-shrink: 0; }
+        .admin-nav-btn[hidden] { display: none; }
+        .admin-nav-badge { margin-left: auto; background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); font-size: 0.66rem; font-weight: 700; padding: 1px 8px; border-radius: 999px; color: var(--text-secondary); }
+        .admin-side-foot { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-color); }
+        .admin-main { min-width: 0; }
+
+        .admin-head { margin-bottom: 24px; }
+        .admin-head h1 { font-size: 1.65rem; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 6px; }
+        .admin-head p { color: var(--text-secondary); font-size: 0.93rem; }
+        .admin-me { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; background: #0a0a0a; border: 1px solid var(--border-color); border-radius: 999px; padding: 6px 14px 6px 8px; font-size: 0.78rem; color: var(--text-secondary); max-width: 100%; flex-wrap: wrap; }
         .admin-me strong { color: var(--text-primary); font-weight: 600; }
 
-        .admin-tabs { display: flex; gap: 6px; margin-bottom: 24px; border-bottom: 1px solid var(--border-color); padding-bottom: 0; flex-wrap: wrap; }
-        .admin-tab { background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--text-secondary); font-family: var(--font-main); font-size: 0.9rem; font-weight: 600; padding: 10px 14px; cursor: pointer; margin-bottom: -1px; transition: color 0.2s, border-color 0.2s; }
-        .admin-tab:hover { color: var(--text-primary); }
-        .admin-tab.active { color: var(--text-primary); border-bottom-color: var(--accent-color); }
-        .admin-tab[hidden] { display: none; }
+        /* Stat tiles */
+        .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 14px; }
+        .stat-card { background: #0d0d0d; border: 1px solid var(--border-color); border-radius: 14px; padding: 16px; }
+        .stat-label { font-size: 0.66rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 10px; }
+        .stat-val { font-size: 1.7rem; font-weight: 700; letter-spacing: -0.03em; line-height: 1; }
+        .stat-val.good { color: var(--status-online); }
+        .stat-val.bad { color: var(--status-offline); }
+        .stat-sub { font-size: 0.73rem; color: var(--text-secondary); margin-top: 7px; }
+
+        .mini-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; background: #0a0a0a; border: 1px solid var(--border-color); border-radius: 10px; margin-bottom: 8px; }
+        .mini-row:last-child { margin-bottom: 0; }
+        .mini-info { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+        .mini-name { font-weight: 600; font-size: 0.88rem; }
+        .mini-game { font-size: 0.73rem; color: var(--text-secondary); }
+        .mini-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+        /* One-click status chips */
+        .status-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+        .status-chip { display: inline-flex; align-items: center; gap: 6px; background: #0a0a0a; border: 1px solid var(--border-color); color: var(--text-secondary); font-family: var(--font-main); font-size: 0.76rem; font-weight: 600; padding: 7px 13px; border-radius: 999px; cursor: pointer; transition: background 0.15s, border-color 0.15s, color 0.15s; }
+        .status-chip .chip-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+        .status-chip:hover { border-color: var(--border-hover); color: var(--text-primary); }
+        .status-chip:disabled { opacity: 0.5; cursor: wait; }
+        .status-chip.chip-online { color: var(--status-online); }
+        .status-chip.chip-updating { color: var(--status-updating); }
+        .status-chip.chip-offline { color: var(--status-offline); }
+        .status-chip.chip-online.active { background: rgba(16,185,129,0.12); border-color: rgba(16,185,129,0.45); }
+        .status-chip.chip-updating.active { background: rgba(245,158,11,0.12); border-color: rgba(245,158,11,0.45); }
+        .status-chip.chip-offline.active { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.45); }
+
+        /* Staff toolbar */
+        .staff-toolbar { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+        .staff-toolbar .admin-input { flex: 1; min-width: 180px; }
+        .staff-toolbar .admin-select { width: auto; min-width: 150px; }
+
+        .admin-head { margin-bottom: 28px; }
+        .admin-me { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; background: #0d0d0d; border: 1px solid var(--border-color); border-radius: 999px; padding: 6px 14px 6px 8px; font-size: 0.82rem; color: var(--text-secondary); }
+        .admin-me strong { color: var(--text-primary); font-weight: 600; }
 
         .admin-panel { display: none; }
         .admin-panel.active { display: block; }
@@ -100,9 +149,22 @@
         .admin-lock { text-align: center; padding: 80px 20px; color: var(--text-secondary); }
         .admin-lock h2 { color: var(--text-primary); font-size: 1.3rem; margin-bottom: 8px; }
 
+        @media (max-width: 900px) {
+            .admin-layout { grid-template-columns: 1fr; }
+            .admin-side { position: static; flex-direction: row; align-items: center; overflow-x: auto; padding: 10px; gap: 6px; scrollbar-width: none; }
+            .admin-side::-webkit-scrollbar { display: none; }
+            .admin-side-brand { border-bottom: none; border-right: 1px solid var(--border-color); padding: 4px 14px 4px 8px; margin: 0 4px 0 0; flex-shrink: 0; }
+            .admin-nav { flex-direction: row; gap: 4px; }
+            .admin-nav-btn { white-space: nowrap; width: auto; padding: 8px 13px; }
+            .admin-nav-badge, .admin-side-foot { display: none; }
+            .stat-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
         @media (max-width: 600px) {
             .admin-shell { padding: 100px 16px 60px; }
             .admin-row { flex-direction: column; align-items: stretch; }
+            .stat-grid { grid-template-columns: 1fr 1fr; }
+            .staff-toolbar .admin-input, .staff-toolbar .admin-select { min-width: 0; width: 100%; }
         }
     </style>
 </head>
@@ -139,23 +201,89 @@
         </div>
 
         <div id="admin-app" hidden>
-            <div class="admin-head">
-                <h1>Admin Panel</h1>
-                <p>Manage product status, patch notes, and staff access.</p>
-                <div class="admin-me">
-                    Signed in as <strong id="admin-me-name">—</strong>
-                    <span class="user-role-badge" id="admin-me-role">—</span>
-                </div>
-            </div>
+            <div class="admin-layout">
+                <aside class="admin-side">
+                    <div class="admin-side-brand"><span class="brand-dot"></span>Vade Control</div>
+                    <nav class="admin-nav">
+                        <button class="admin-nav-btn active" data-tab="overview">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                            Overview
+                        </button>
+                        <button class="admin-nav-btn" data-tab="products">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                            Products <span class="admin-nav-badge" id="nav-badge-products">—</span>
+                        </button>
+                        <button class="admin-nav-btn" data-tab="changelog">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            Changelog <span class="admin-nav-badge" id="nav-badge-cl">—</span>
+                        </button>
+                        <button class="admin-nav-btn" data-tab="staff" id="tab-staff" hidden>
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            Users &amp; Roles
+                        </button>
+                    </nav>
+                    <div class="admin-side-foot">
+                        <div class="admin-me">
+                            Signed in as <strong id="admin-me-name">—</strong>
+                            <span class="user-role-badge" id="admin-me-role">—</span>
+                        </div>
+                    </div>
+                </aside>
 
-            <div class="admin-tabs">
-                <button class="admin-tab active" data-tab="products">Products</button>
-                <button class="admin-tab" data-tab="changelog">Changelog</button>
-                <button class="admin-tab" data-tab="staff" id="tab-staff" hidden>Staff</button>
-            </div>
+                <div class="admin-main">
+                    <div class="admin-head">
+                        <h1 id="admin-title">Overview</h1>
+                        <p id="admin-sub">Everything happening across Vade, at a glance.</p>
+                    </div>
 
-            <!-- PRODUCTS -->
-            <section class="admin-panel active" id="panel-products">
+                    <!-- OVERVIEW -->
+                    <section class="admin-panel active" id="panel-overview">
+                        <div class="stat-grid">
+                            <div class="stat-card">
+                                <div class="stat-label">Products online</div>
+                                <div class="stat-val good" id="st-online">—</div>
+                                <div class="stat-sub" id="st-online-sub">of — products</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Products down</div>
+                                <div class="stat-val bad" id="st-offline">—</div>
+                                <div class="stat-sub" id="st-offline-sub">— updating</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Registered users</div>
+                                <div class="stat-val" id="st-users">—</div>
+                                <div class="stat-sub" id="st-users-sub">— staff members</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Patch notes</div>
+                                <div class="stat-val" id="st-notes">—</div>
+                                <div class="stat-sub">published entries</div>
+                            </div>
+                        </div>
+
+                        <div class="admin-card">
+                            <div class="admin-card-head">
+                                <div>
+                                    <div class="admin-card-title">Product health</div>
+                                    <div class="admin-card-sub">Click manage to change status or description</div>
+                                </div>
+                            </div>
+                            <div id="ov-products"><div class="admin-empty">Loading…</div></div>
+                        </div>
+
+                        <div class="admin-card">
+                            <div class="admin-card-head">
+                                <div>
+                                    <div class="admin-card-title">Latest patch notes</div>
+                                    <div class="admin-card-sub">Newest entries across all products</div>
+                                </div>
+                            </div>
+                            <div id="ov-notes"><div class="admin-empty">Loading…</div></div>
+                        </div>
+                    </section>
+
+                    <!-- PRODUCTS -->
+                    <section class="admin-panel" id="panel-products">
                 <div class="admin-note">
                     Status changes here show on the public <a href="status.html" style="color:var(--accent-color);">status page</a> immediately. Set a product to <strong>Offline</strong> or <strong>Updating</strong> when it goes down.
                 </div>
@@ -228,25 +356,37 @@
                     <div class="admin-card-head">
                         <div>
                             <div class="admin-card-title">Users</div>
-                            <div class="admin-card-sub">Change a user's role. Takes effect on their next page load.</div>
+                            <div class="admin-card-sub" id="staff-count">Change a user's role. Takes effect on their next page load.</div>
                         </div>
+                    </div>
+                    <div class="staff-toolbar">
+                        <input class="admin-input" id="staff-search" placeholder="Search by username or ID…" autocomplete="off">
+                        <select class="admin-select" id="staff-role-filter">
+                            <option value="all">All roles</option>
+                            <option value="customer">Customer</option>
+                            <option value="staff">Staff</option>
+                            <option value="co_owner">Co-Owner</option>
+                            <option value="owner">Owner</option>
+                        </select>
                     </div>
                     <div id="staff-list">
                         <div class="admin-empty">Loading users…</div>
                     </div>
                 </div>
             </section>
+                </div>
+            </div>
         </div>
     </main>
 
     <div class="admin-toast" id="admin-toast"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-    <script src="config.js?v=7"></script>
-    <script src="supabase-client.js?v=7"></script>
-    <script src="auth-roles.js?v=7"></script>
-    <script src="main.js?v=7"></script>
-    <script src="logo-data.js?v=7"></script>
+    <script src="config.js?v=8"></script>
+    <script src="supabase-client.js?v=8"></script>
+    <script src="auth-roles.js?v=8"></script>
+    <script src="main.js?v=8"></script>
+    <script src="logo-data.js?v=8"></script>
     <script>if(window.VADE_LOGO){var el=document.getElementById('nav-logo');if(el)el.src=window.VADE_LOGO;}</script>
     <script>
     (function () {
@@ -276,16 +416,39 @@
             return months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
         }
 
-        // ── Tabs ──
-        document.querySelectorAll('.admin-tab').forEach(function (tab) {
-            tab.addEventListener('click', function () {
-                document.querySelectorAll('.admin-tab').forEach(function (t) { t.classList.remove('active'); });
-                document.querySelectorAll('.admin-panel').forEach(function (p) { p.classList.remove('active'); });
-                tab.classList.add('active');
-                document.getElementById('panel-' + tab.getAttribute('data-tab')).classList.add('active');
-                if (tab.getAttribute('data-tab') === 'staff') loadStaff();
-                if (tab.getAttribute('data-tab') === 'changelog') loadChangelogs();
+        // ── Navigation ──
+        var TAB_META = {
+            overview: { t: 'Overview', s: 'Everything happening across Vade, at a glance.' },
+            products: { t: 'Products', s: 'Live status and public descriptions shown on the status page.' },
+            changelog: { t: 'Changelog', s: 'Patch notes shown when users open a product changelog.' },
+            staff:    { t: 'Users & Roles', s: 'Manage staff access and role assignments.' }
+        };
+
+        function activateTab(name, skipHash) {
+            if (!TAB_META[name]) name = 'overview';
+            if (name === 'staff' && !(me && R.atLeast(me.role, 'co_owner'))) name = 'overview';
+
+            document.querySelectorAll('.admin-nav-btn').forEach(function (b) {
+                b.classList.toggle('active', b.getAttribute('data-tab') === name);
             });
+            document.querySelectorAll('.admin-panel').forEach(function (p) {
+                p.classList.toggle('active', p.id === 'panel-' + name);
+            });
+            document.getElementById('admin-title').textContent = TAB_META[name].t;
+            document.getElementById('admin-sub').textContent = TAB_META[name].s;
+
+            if (!skipHash && location.hash.slice(1) !== name) location.hash = name;
+            if (name === 'staff') loadStaff();
+            if (name === 'changelog') renderChangelogs();
+            if (name === 'overview') renderOverview();
+        }
+
+        document.querySelectorAll('.admin-nav-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () { activateTab(btn.getAttribute('data-tab')); });
+        });
+
+        window.addEventListener('hashchange', function () {
+            activateTab(location.hash.slice(1), true);
         });
 
         // ── Products ──
@@ -311,6 +474,9 @@
                 return;
             }
             wrap.innerHTML = products.map(function (p) {
+                function chip(s, label) {
+                    return '<button type="button" class="status-chip chip-' + s + (p.status === s ? ' active' : '') + '" data-status="' + s + '"><span class="chip-dot"></span>' + label + '</button>';
+                }
                 return '<div class="admin-card" data-slug="' + esc(p.slug) + '">' +
                     '<div class="admin-card-head">' +
                         '<div>' +
@@ -319,42 +485,64 @@
                         '</div>' +
                         '<span class="admin-status-pill ' + esc(p.status) + '">' + esc(p.status) + '</span>' +
                     '</div>' +
-                    '<div class="admin-row" style="margin-bottom:12px;">' +
-                        '<div class="admin-field">' +
-                            '<label class="admin-label">Status</label>' +
-                            '<select class="admin-select prod-status">' +
-                                '<option value="online"' + (p.status === 'online' ? ' selected' : '') + '>Online / Operational</option>' +
-                                '<option value="updating"' + (p.status === 'updating' ? ' selected' : '') + '>Updating</option>' +
-                                '<option value="offline"' + (p.status === 'offline' ? ' selected' : '') + '>Offline</option>' +
-                            '</select>' +
+                    '<div class="admin-field">' +
+                        '<label class="admin-label">Status — click to apply instantly</label>' +
+                        '<div class="status-chips">' +
+                            chip('online', 'Online') + chip('updating', 'Updating') + chip('offline', 'Offline') +
                         '</div>' +
                     '</div>' +
-                    '<div class="admin-field">' +
+                    '<div class="admin-field" style="margin-top:12px;">' +
                         '<label class="admin-label">Public description</label>' +
                         '<input class="admin-input prod-desc" value="' + esc(p.description) + '">' +
                     '</div>' +
                     '<div style="margin-top:12px;">' +
-                        '<button type="button" class="admin-btn sm prod-save">Save changes</button>' +
+                        '<button type="button" class="admin-btn sm prod-save">Save description</button>' +
                     '</div>' +
                 '</div>';
             }).join('');
 
             wrap.querySelectorAll('.admin-card').forEach(function (card) {
+                var slug = card.getAttribute('data-slug');
+
+                function applyStatus(newStatus) {
+                    return sb.from('products')
+                        .update({ status: newStatus, updated_at: new Date().toISOString() })
+                        .eq('slug', slug);
+                }
+
+                card.querySelectorAll('.status-chip').forEach(function (chipBtn) {
+                    chipBtn.addEventListener('click', async function () {
+                        var newStatus = chipBtn.getAttribute('data-status');
+                        var p = products.find(function (x) { return x.slug === slug; });
+                        if (p && p.status === newStatus) return;
+                        card.querySelectorAll('.status-chip').forEach(function (b) { b.disabled = true; });
+                        var { error } = await applyStatus(newStatus);
+                        card.querySelectorAll('.status-chip').forEach(function (b) { b.disabled = false; });
+                        if (error) { toast('Update failed: ' + error.message, true); return; }
+                        if (p) p.status = newStatus;
+                        card.querySelectorAll('.status-chip').forEach(function (b) {
+                            b.classList.toggle('active', b.getAttribute('data-status') === newStatus);
+                        });
+                        var pill = card.querySelector('.admin-status-pill');
+                        pill.className = 'admin-status-pill ' + newStatus;
+                        pill.textContent = newStatus;
+                        toast(slug + ' → ' + newStatus);
+                        renderOverview();
+                    });
+                });
+
                 card.querySelector('.prod-save').addEventListener('click', async function () {
-                    var slug = card.getAttribute('data-slug');
-                    var status = card.querySelector('.prod-status').value;
                     var desc = card.querySelector('.prod-desc').value.trim();
+                    var status = card.querySelector('.status-chip.active').getAttribute('data-status');
                     var btn = card.querySelector('.prod-save');
                     btn.disabled = true;
-                    var { error } = await sb.from('products')
+                    var res = await sb.from('products')
                         .update({ status: status, description: desc, updated_at: new Date().toISOString() })
                         .eq('slug', slug);
                     btn.disabled = false;
-                    if (error) { toast('Save failed: ' + error.message, true); return; }
+                    if (res.error) { toast('Save failed: ' + res.error.message, true); return; }
                     var p = products.find(function (x) { return x.slug === slug; });
-                    if (p) { p.status = status; p.description = desc; }
-                    card.querySelector('.admin-status-pill').className = 'admin-status-pill ' + status;
-                    card.querySelector('.admin-status-pill').textContent = status;
+                    if (p) p.description = desc;
                     toast('Saved ' + slug);
                 });
             });
@@ -479,19 +667,109 @@
 
         document.getElementById('cl-filter').addEventListener('change', renderChangelogs);
 
-        // ── Staff ──
-        async function loadStaff() {
+        // ── Users cache ──
+        var usersCache = [];
+
+        async function fetchUsers() {
             var { data, error } = await sb
                 .from('profiles')
                 .select('id, username, discord_id, role')
                 .order('role', { ascending: false });
-            if (error) {
-                document.getElementById('staff-list').innerHTML = '<div class="admin-empty">Could not load users: ' + esc(error.message) + '</div>';
+            usersCache = error ? [] : (data || []);
+            return usersCache;
+        }
+
+        // ── Overview ──
+        function renderOverview() {
+            var online = 0, offline = 0, updating = 0;
+            products.forEach(function (p) {
+                if (p.status === 'offline') offline++;
+                else if (p.status === 'updating') updating++;
+                else online++;
+            });
+            document.getElementById('st-online').textContent = online;
+            document.getElementById('st-online-sub').textContent = 'of ' + products.length + ' products';
+            document.getElementById('st-offline').textContent = offline;
+            document.getElementById('st-offline-sub').textContent = updating + ' updating';
+            document.getElementById('st-users').textContent = usersCache.length || '—';
+            var staffN = usersCache.filter(function (u) { return u.role && u.role !== 'customer'; }).length;
+            document.getElementById('st-users-sub').textContent = staffN + (staffN === 1 ? ' staff member' : ' staff members');
+            document.getElementById('st-notes').textContent = allEntries.length;
+
+            var bp = document.getElementById('nav-badge-products');
+            if (bp) bp.textContent = products.length;
+            var bc = document.getElementById('nav-badge-cl');
+            if (bc) bc.textContent = allEntries.length;
+
+            var ovp = document.getElementById('ov-products');
+            if (!products.length) {
+                ovp.innerHTML = '<div class="admin-empty">No products found.</div>';
+            } else {
+                ovp.innerHTML = products.map(function (p) {
+                    return '<div class="mini-row">' +
+                        '<div class="mini-info">' +
+                            '<span class="mini-name">' + esc(p.name) + '</span>' +
+                            '<span class="mini-game">' + esc(p.game) + '</span>' +
+                        '</div>' +
+                        '<div class="mini-right">' +
+                            '<span class="admin-status-pill ' + esc(p.status) + '">' + esc(p.status) + '</span>' +
+                            '<button type="button" class="admin-btn ghost sm ov-manage">Manage</button>' +
+                        '</div>' +
+                    '</div>';
+                }).join('');
+                ovp.querySelectorAll('.ov-manage').forEach(function (b) {
+                    b.addEventListener('click', function () { activateTab('products'); });
+                });
+            }
+
+            var ovn = document.getElementById('ov-notes');
+            var latest = allEntries.slice(0, 3);
+            if (!latest.length) {
+                ovn.innerHTML = '<div class="admin-empty">No patch notes yet.</div>';
+            } else {
+                ovn.innerHTML = latest.map(function (e) {
+                    var prod = products.find(function (p) { return p.slug === e.product_slug; });
+                    var pname = prod ? prod.name : e.product_slug;
+                    return '<div class="mini-row">' +
+                        '<div class="mini-info">' +
+                            '<span class="mini-name">' + esc(e.version) + ' · ' + esc(pname) + '</span>' +
+                            '<span class="mini-game">' + esc(e.title || ((e.items || []).length + ' changes')) + '</span>' +
+                        '</div>' +
+                        '<div class="mini-right"><span class="mini-game">' + esc(e.entry_date) + '</span></div>' +
+                    '</div>';
+                }).join('');
+            }
+        }
+
+        // ── Staff ──
+        async function loadStaff() {
+            await fetchUsers();
+            renderStaff();
+        }
+
+        function renderStaff() {
+            var q = (document.getElementById('staff-search').value || '').trim().toLowerCase();
+            var rf = document.getElementById('staff-role-filter').value || 'all';
+            var data = usersCache.filter(function (u) {
+                var role = u.role || 'customer';
+                if (rf !== 'all' && role !== rf) return false;
+                if (q) {
+                    var hay = ((u.username || '') + ' ' + u.id).toLowerCase();
+                    if (hay.indexOf(q) === -1) return false;
+                }
+                return true;
+            });
+
+            document.getElementById('staff-count').textContent =
+                data.length + ' of ' + usersCache.length + ' users shown · role changes apply on their next page load';
+
+            var wrap = document.getElementById('staff-list');
+            if (!usersCache.length) {
+                wrap.innerHTML = '<div class="admin-empty">No users found.</div>';
                 return;
             }
-            var wrap = document.getElementById('staff-list');
-            if (!data || !data.length) {
-                wrap.innerHTML = '<div class="admin-empty">No users found.</div>';
+            if (!data.length) {
+                wrap.innerHTML = '<div class="admin-empty">No users match your search.</div>';
                 return;
             }
             wrap.innerHTML = data.map(function (u) {
@@ -531,9 +809,13 @@
                     if (error) { toast('Update failed: ' + error.message, true); return; }
                     toast('Role updated');
                     loadStaff();
+                    renderOverview();
                 });
             });
         }
+
+        document.getElementById('staff-search').addEventListener('input', renderStaff);
+        document.getElementById('staff-role-filter').addEventListener('change', renderStaff);
 
         // ── Boot ──
         async function boot() {
@@ -561,6 +843,11 @@
             addItemRow('fixed', '');
             await loadProducts();
             await loadChangelogs();
+            await fetchUsers();
+            renderOverview();
+
+            var initial = location.hash.slice(1);
+            activateTab(TAB_META[initial] ? initial : 'overview');
         }
 
         boot();
