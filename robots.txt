@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /dashboard.html
+Disallow: /discord-callback.html
+Disallow: /confirmed.html
+
+Sitemap: https://vadesolutions.fun/sitemap.xml

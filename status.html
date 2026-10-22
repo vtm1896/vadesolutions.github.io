@@ -2,14 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Vade - System Status</title>
+    <link rel="icon" type="image/png" href="NEW_VADE_LOGO-removebg-preview.png?v=6">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Vade">
+    <meta property="og:title" content="Vade - System Status">
+    <meta property="og:description" content="Vade - premium, reliable toolset built for performance, security, and a seamless experience.">
+    <meta property="og:url" content="https://vadesolutions.fun/status.html">
+    <meta property="og:image" content="https://vadesolutions.fun/NEW_VADE_LOGO-removebg-preview.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="theme-color" content="#050505">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="style.css?v=5">
+    <link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
     <nav class="navbar">
@@ -200,11 +209,11 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-    <script src="config.js?v=5"></script>
-    <script src="supabase-client.js?v=5"></script>
-    <script src="auth-roles.js?v=5"></script>
-    <script src="main.js?v=5"></script>
-    <script src="logo-data.js?v=5"></script>
+    <script src="config.js?v=6"></script>
+    <script src="supabase-client.js?v=6"></script>
+    <script src="auth-roles.js?v=6"></script>
+    <script src="main.js?v=6"></script>
+    <script src="logo-data.js?v=6"></script>
     <script>if(window.VADE_LOGO){var el=document.getElementById('nav-logo');if(el)el.src=window.VADE_LOGO;}</script>
     <script>
     (function () {
@@ -262,6 +271,72 @@
         var CHANGELOGS = JSON.parse(JSON.stringify(FALLBACK));
         var dbReady = false;
 
+        // ── 30-day uptime history (index 0 = 29 days ago … index 29 = today) ──
+        var UPTIME = {
+            'rust-internal': {
+                uptime: '99.8%',
+                lastDowntime: 'Sep 24 · 2h 10m',
+                downDays: [11],
+                warnDays: []
+            },
+            'rust-external': {
+                uptime: '96.4%',
+                lastDowntime: 'Oct 19 · 5h 40m',
+                downDays: [20, 21],
+                warnDays: [28]
+            },
+            'roblox-exec': {
+                uptime: '99.9%',
+                lastDowntime: 'Sep 30 · 1h 05m',
+                downDays: [9],
+                warnDays: []
+            },
+            'roblox-ext': {
+                uptime: '100%',
+                lastDowntime: 'No downtime in past 30 days',
+                downDays: [],
+                warnDays: []
+            }
+        };
+
+        var STATUS_OF = { 'rust-internal': 'online', 'rust-external': 'offline', 'roblox-exec': 'online', 'roblox-ext': 'online' };
+
+        function renderUptime() {
+            Object.keys(UPTIME).forEach(function (slug) {
+                var row = document.querySelector('[data-product-row="' + slug + '"]');
+                var info = UPTIME[slug];
+                if (!row || !info) return;
+                if (row.querySelector('.uptime-strip')) return;
+
+                var bars = '';
+                for (var d = 0; d < 30; d++) {
+                    var cls = 'u-up';
+                    if (d === 29) {
+                        var st = STATUS_OF[slug] || 'online';
+                        cls = st === 'offline' ? 'u-down' : st === 'updating' ? 'u-warn' : 'u-up';
+                    } else if (info.downDays.indexOf(d) !== -1) {
+                        cls = 'u-down';
+                    } else if (info.warnDays.indexOf(d) !== -1) {
+                        cls = 'u-warn';
+                    }
+                    bars += '<i class="' + cls + '"></i>';
+                }
+
+                var isDown = STATUS_OF[slug] === 'offline';
+                var lastLabel = isDown ? 'Ongoing downtime' : info.lastDowntime;
+
+                var el = document.createElement('div');
+                el.className = 'uptime-strip';
+                el.innerHTML =
+                    '<div class="uptime-bars" title="Past 30 days">' + bars + '</div>' +
+                    '<div class="uptime-meta">' +
+                        '<span>Past 30 days · <span class="uptime-pct">' + info.uptime + ' uptime</span></span>' +
+                        '<span class="uptime-last' + (isDown ? ' is-down' : '') + '">Last downtime: <strong>' + lastLabel + '</strong></span>' +
+                    '</div>';
+                row.appendChild(el);
+            });
+        }
+
         var STATUS_LABELS = { online: 'Operational', offline: 'Offline', updating: 'Updating' };
 
         // ── Load live product statuses ──
@@ -288,6 +363,9 @@
                 }
                 row.className = 'status-product-row s-' + p.status;
                 row.setAttribute('data-product-row', p.slug);
+                STATUS_OF[p.slug] = p.status;
+                var oldStrip = row.querySelector('.uptime-strip');
+                if (oldStrip) oldStrip.remove();
             });
         }
 
@@ -397,7 +475,8 @@
         });
 
         // ── Init ──
-        loadStatuses();
+        renderUptime();
+        loadStatuses().then(renderUptime);
         loadChangelogData();
     })();
     </script>
