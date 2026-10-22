@@ -3,9 +3,9 @@ window.SUPABASE_ANON_KEY = 'sb_publishable_pGgBlzR91_qs2wMLdWes6Q_lWzFbKZR';
 
 // Discord channel webhook — alerts fire on status flips, maintenance, license batches.
 // Paste a webhook URL from Discord: Channel Settings → Integrations → Webhooks. Leave '' to disable.
-window.DISCORD_WEBHOOK_URL = '';
+window.DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1562656607018418198/KHc2qbD4zbIpqKjzavoV_tF61L7HxTXsv0sX71PySWYLlNizWNWa3fo5NWUEQ_tB9srS';
 
 // KeyAuth proxy (Supabase Edge Function) — holds your KeyAuth secret server-side.
 // Deploy: supabase functions deploy keyauth-proxy
 // Then set the URL to: https://<project-ref>.supabase.co/functions/v1/keyauth-proxy
-window.KEYAUTH_PROXY = '';
+window.KEYAUTH_PROXY = 'https://xkgfuqufcknrnzcqcvpt.supabase.co/functions/v1/keyauth-proxy';
