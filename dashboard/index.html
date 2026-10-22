@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Vade - Dashboard</title>
+    <link rel="icon" type="image/png" href="/NEW_VADE_LOGO-removebg-preview.png?v=11">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Vade">
+    <meta property="og:title" content="Vade - Dashboard">
+    <meta property="og:description" content="Vade - premium, reliable toolset built for performance, security, and a seamless experience.">
+    <meta property="og:url" content="https://vadesolutions.fun/dashboard/">
+    <meta property="og:image" content="https://vadesolutions.fun/NEW_VADE_LOGO-removebg-preview.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="theme-color" content="#050505">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',sans-serif; background:#050505; color:#fff; display:flex; min-height:100vh; }
+
+        /* Sidebar */
+        .db-sidebar { width:220px; flex-shrink:0; background:#0a0a0a; border-right:1px solid rgba(255,255,255,0.06); display:flex; flex-direction:column; position:fixed; top:0; left:0; height:100vh; z-index:100; }
+        .db-logo { display:flex; align-items:center; gap:10px; padding:20px; border-bottom:1px solid rgba(255,255,255,0.06); text-decoration:none; }
+        .db-logo-icon { display:none; }
+        .db-logo span { display:none; }
+        .db-logo .logo-img { height:32px; width:auto; object-fit:contain; }
+        .db-nav { flex:1; padding:12px 10px; display:flex; flex-direction:column; gap:2px; }
+        .db-nav-btn { display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:8px; color:#555; font-size:0.875rem; font-weight:500; text-decoration:none; cursor:pointer; border:none; background:none; width:100%; text-align:left; transition:background 0.15s,color 0.15s; font-family:'Inter',sans-serif; }
+        .db-nav-btn:hover { background:rgba(255,255,255,0.05); color:#ccc; }
+        .db-nav-btn.active { background:rgba(139,92,246,0.1); color:#fff; }
+        .db-nav-btn.active svg { color:#8b5cf6; opacity:1; }
+        .db-nav-btn svg { opacity:0.4; flex-shrink:0; }
+        .db-divider { height:1px; background:rgba(255,255,255,0.06); margin:6px 0; }
+        .db-footer { padding:12px 10px; border-top:1px solid rgba(255,255,255,0.06); }
+        .db-user-row { display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:8px; margin-bottom:4px; }
+        .db-user-av { width:30px; height:30px; border-radius:50%; overflow:hidden; background:#1a1a1a; border:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; justify-content:center; flex-shrink:0; color:#666; }
+        .db-user-av img { width:100%; height:100%; object-fit:cover; }
+        .db-user-info { display:flex; flex-direction:column; min-width:0; }
+        .db-user-name { font-size:0.82rem; font-weight:600; color:#fff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:110px; }
+        .db-user-role { font-size:0.7rem; color:#444; }
+        .db-logout { display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:8px; color:#ef4444; font-size:0.875rem; font-weight:500; cursor:pointer; border:none; background:none; width:100%; font-family:'Inter',sans-serif; transition:background 0.15s; }
+        .db-logout:hover { background:rgba(239,68,68,0.08); color:#f87171; }
+
+        /* Main */
+        .db-main { margin-left:220px; flex:1; display:flex; flex-direction:column; }
+        .db-topbar { height:48px; border-bottom:1px solid #1a1a1a; display:flex; align-items:center; justify-content:center; padding:0 28px; background:#080808; position:sticky; top:0; z-index:50; }
+        .db-topbar h1 { font-size:0.9rem; font-weight:600; color:#fff; }
+        .db-content { padding:32px 40px; display:flex; flex-direction:column; gap:24px; max-width:900px; width:100%; margin:0 auto; }
+
+        @media (max-width: 768px) {
+            body { flex-direction:column; }
+            .db-sidebar { position:sticky; top:0; left:auto; width:100%; height:auto; flex-direction:row; align-items:center; border-right:none; border-bottom:1px solid rgba(255,255,255,0.06); overflow-x:auto; }
+            .db-logo { padding:10px 14px; border-bottom:none; border-right:1px solid rgba(255,255,255,0.06); flex-shrink:0; }
+            .db-nav { flex-direction:row; padding:6px 8px; gap:4px; flex:1; overflow-x:auto; }
+            .db-nav-btn { white-space:nowrap; width:auto; padding:8px 12px; }
+            .db-divider { display:none; }
+            .db-footer { display:none; }
+            .db-main { margin-left:0; }
+            .db-content { padding:20px 16px; }
+        }
+        @media (max-width: 480px) {
+            .db-nav-btn span { display:none; }
+            .db-nav-btn { padding:10px; }
+            .db-topbar { padding:0 16px; }
+        }
+
+        /* Cards */
+        .db-card { background:#111; border:1px solid rgba(255,255,255,0.06); border-radius:12px; overflow:hidden; }
+        .db-card-head { padding:20px 24px 0; }
+        .db-card-title { font-size:1rem; font-weight:700; color:#fff; margin-bottom:4px; }
+        .db-card-sub { font-size:0.82rem; color:#666; padding-bottom:16px; }
+        .db-card-body { padding:20px 24px; }
+
+        /* Profile */
+        .db-profile-row { display:flex; align-items:center; gap:16px; padding-bottom:20px; }
+        .db-profile-av { width:60px; height:60px; border-radius:50%; overflow:hidden; background:#1a1a1a; border:2px solid rgba(255,255,255,0.08); display:flex; align-items:center; justify-content:center; flex-shrink:0; color:#666; }
+        .db-profile-av img { width:100%; height:100%; object-fit:cover; }
+        .db-profile-name { font-size:1.2rem; font-weight:700; color:#fff; }
+        .db-profile-tag { font-size:0.82rem; color:#666; margin-top:2px; }
+
+        /* Info grid */
+        .db-info-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:rgba(255,255,255,0.04); border-radius:10px; overflow:hidden; }
+        .db-info-box { background:#111; padding:16px 18px; }
+        .db-info-label { font-size:0.68rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:#555; margin-bottom:6px; }
+        .db-info-value { font-size:0.88rem; font-weight:600; color:#fff; word-break:break-all; }
+
+        /* Discord row */
+        .dc-row { display:flex; align-items:center; gap:14px; padding:14px 16px; background:#0c0c0c; border:1px solid rgba(255,255,255,0.06); border-radius:10px; }
+        .dc-av { width:40px; height:40px; border-radius:50%; overflow:hidden; background:#1a1a1a; border:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; justify-content:center; flex-shrink:0; color:#666; }
+        .dc-av img { width:100%; height:100%; object-fit:cover; }
+        .dc-info { flex:1; }
+        .dc-name { font-size:0.9rem; font-weight:600; color:#fff; }
+        .dc-id { font-size:0.75rem; color:#666; margin-top:2px; }
+        .dc-unlink { background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.25); color:#ef4444; font-size:0.8rem; font-weight:600; padding:7px 16px; border-radius:8px; cursor:pointer; font-family:'Inter',sans-serif; transition:background 0.2s; }
+        .dc-unlink:hover { background:rgba(239,68,68,0.18); }
+        .dc-link-btn { display:inline-flex; align-items:center; gap:8px; background:rgba(88,101,242,0.1); border:1px solid rgba(88,101,242,0.25); color:#8b9cf8; font-size:0.85rem; font-weight:600; padding:10px 18px; border-radius:8px; text-decoration:none; transition:background 0.2s; }
+        .dc-link-btn:hover { background:rgba(88,101,242,0.2); color:#fff; }
+
+        /* Pages */
+        .db-page { display:none; }
+        .db-page.active { display:block; }
+        .db-coming { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:60px 20px; text-align:center; gap:12px; }
+        .db-coming svg { color:#333; }
+        .db-coming h3 { font-size:1rem; font-weight:600; color:#666; }
+        .db-coming p { font-size:0.85rem; color:#444; }
+
+        /* Password form */
+        .pw-label { display:block; font-size:0.82rem; font-weight:600; color:#fff; margin-bottom:6px; }
+        .pw-input { width:100%; background:#0c0c0c; border:1px solid rgba(255,255,255,0.08); color:#fff; padding:10px 14px; border-radius:8px; font-family:'Inter',sans-serif; font-size:0.9rem; outline:none; }
+        .pw-input:focus { border-color:#8b5cf6; }
+        .pw-btn { background:#8b5cf6; color:#fff; border:none; padding:11px 20px; border-radius:8px; font-size:0.9rem; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; transition:background 0.2s; white-space:nowrap; }
+        .pw-btn:hover { background:#7c3aed; }
+
+        /* Subscriptions */
+        .sub-empty { text-align:center; padding:36px 20px; color:#555; font-size:0.88rem; background:#0a0a0a; border:1px solid #1a1a1a; border-radius:10px; margin-bottom:20px; }
+        .sub-redeem-label { display:block; font-size:0.7rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:#555; margin-bottom:8px; }
+        .sub-redeem-row { display:flex; gap:10px; }
+        .sub-redeem-row .pw-input { flex:1; }
+        .sub-license-row { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; background:#0a0a0a; border:1px solid #1a1a1a; border-radius:10px; margin-bottom:8px; }
+        .sub-license-key { font-size:0.85rem; font-weight:600; color:#fff; font-family:monospace; letter-spacing:0.05em; }
+        .sub-license-product { font-size:0.75rem; color:#555; margin-top:2px; }
+        .sub-license-active { display:inline-block; padding:3px 10px; border-radius:50px; font-size:0.72rem; font-weight:600; background:rgba(16,185,129,0.12); color:#10b981; border:1px solid rgba(16,185,129,0.25); }
+
+        /* Page heading */
+        .db-page-heading { font-size:1.15rem; font-weight:700; color:#fff; margin-bottom:16px; }
+    </style>
+</head>
+<body>
+
+<aside class="db-sidebar">
+    <a href="/" class="db-logo">
+        <img src="" alt="Vade" class="logo-img" id="nav-logo">
+    </a>
+    <nav class="db-nav">
+        <button class="db-nav-btn active" data-page="account">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Account</span>
+        </button>
+        <button class="db-nav-btn" data-page="subscriptions">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            <span>Subscriptions</span>
+        </button>
+        <button class="db-nav-btn" data-page="loader">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>Loader</span>
+        </button>
+        <button class="db-nav-btn" data-page="password">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span>Password</span>
+        </button>
+        <div class="db-divider"></div>
+        <a href="/" class="db-nav-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Home</span>
+        </a>
+    </nav>
+    <div class="db-footer">
+        <div class="db-user-row">
+            <div class="db-user-av" id="sb-av">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div class="db-user-info">
+                <span class="db-user-name" id="sb-name">Loading...</span>
+                <span class="db-user-role">User</span>
+            </div>
+        </div>
+        <button class="db-logout" id="btn-logout">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <span>Logout</span>
+        </button>
+    </div>
+</aside>
+
+<main class="db-main">
+    <div class="db-topbar"><h1 id="page-title">Account</h1></div>
+    <div class="db-content">
+
+        <!-- Account page -->
+        <div class="db-page active" id="page-account">
+            <div class="db-card">
+                <div class="db-card-body">
+                    <div class="db-profile-row">
+                        <div class="db-profile-av" id="profile-av">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        </div>
+                        <div>
+                            <div class="db-profile-name" id="profile-name">Loading...</div>
+                            <div class="db-profile-tag" id="profile-tag">Loading...</div>
+                        </div>
+                    </div>
+                    <div class="db-info-grid">
+                        <div class="db-info-box"><div class="db-info-label">Username</div><div class="db-info-value" id="info-user">—</div></div>
+                        <div class="db-info-box"><div class="db-info-label">User ID</div><div class="db-info-value" id="info-id" style="font-size:0.75rem;">—</div></div>
+                        <div class="db-info-box"><div class="db-info-label">Member Since</div><div class="db-info-value" id="info-since">—</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="db-card">
+                <div class="db-card-head">
+                    <div class="db-card-title">Discord Account</div>
+                    <div class="db-card-sub">Verified and linked to your Vade account.</div>
+                </div>
+                <div class="db-card-body" id="dc-body">
+                    <p style="color:#555;font-size:0.85rem;">Loading...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subscriptions page -->
+        <div class="db-page" id="page-subscriptions">
+            <div class="db-card">
+                <div class="db-card-head">
+                    <div class="db-card-title">Subscription & Licenses</div>
+                </div>
+                <div class="db-card-body">
+                    <div id="sub-licenses-list">
+                        <div class="sub-empty">No active licenses found on your account. Register a key below.</div>
+                    </div>
+                    <div class="sub-redeem">
+                        <label class="sub-redeem-label">REDEEM LICENSE KEY</label>
+                        <div class="sub-redeem-row">
+                            <input type="text" id="redeem-key" class="pw-input" placeholder="****-****-****-****" maxlength="19" spellcheck="false" autocomplete="off">
+                            <button type="button" id="redeem-btn" class="pw-btn">Redeem Key</button>
+                        </div>
+                        <p id="redeem-msg" style="font-size:0.82rem;display:none;margin-top:8px;"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loader page -->
+        <div class="db-page" id="page-loader">
+            <div class="db-card"><div class="db-coming">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <h3>Loader / Download</h3><p>Download links for your products will appear here.</p>
+            </div></div>
+        </div>
+
+        <!-- Password page -->
+        <div class="db-page" id="page-password">
+            <div class="db-card">
+                <div class="db-card-head">
+                    <div class="db-card-title">Change Password</div>
+                    <div class="db-card-sub">Update your account password.</div>
+                </div>
+                <div class="db-card-body">
+                    <form id="pw-form" style="display:flex;flex-direction:column;gap:16px;max-width:400px;">
+                        <div><label class="pw-label">New Password</label><input type="password" id="pw-new" class="pw-input" placeholder="VadeSolutions...."></div>
+                        <button type="submit" class="pw-btn">Update Password</button>
+                        <p id="pw-msg" style="font-size:0.82rem;display:none;"></p>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/config.js?v=11"></script>
+<script src="/supabase-client.js?v=11"></script>
+<script>
+(async function () {
+    var sb = window.supabaseClient;
+
+    var result = await sb.auth.getSession();
+    var session = result.data.session;
+    if (!session) {
+        window.location.href = '/login/';
+        return;
+    }
+
+    var user = session.user;
+
+    // Nav switching
+    function switchPage(pageName) {
+        document.querySelectorAll('.db-nav-btn').forEach(function (b) { b.classList.remove('active'); });
+        document.querySelectorAll('.db-page').forEach(function (p) { p.classList.remove('active'); });
+        var btn = document.querySelector('.db-nav-btn[data-page="' + pageName + '"]');
+        if (btn) btn.classList.add('active');
+        var pg = document.getElementById('page-' + pageName);
+        if (pg) pg.classList.add('active');
+        document.getElementById('page-title').textContent = btn ? btn.querySelector('span').textContent : pageName;
+    }
+
+    document.querySelectorAll('.db-nav-btn[data-page]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            switchPage(btn.dataset.page);
+        });
+    });
+
+    // Check hash for direct tab navigation (e.g., /dashboard/#subscriptions)
+    var hashPage = window.location.hash.replace('#', '');
+    if (hashPage && document.getElementById('page-' + hashPage)) {
+        switchPage(hashPage);
+    }
+
+    // Logout
+    document.getElementById('btn-logout').addEventListener('click', async function () {
+        await sb.auth.signOut();
+        window.location.href = '/login/';
+    });
+
+    // Load profile
+    var { data: profile } = await sb
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+    var displayName = profile ? profile.username : user.user_metadata.username || user.email;
+    var discordId = (profile && profile.discord_id) || null;
+    var avatarHash = (profile && profile.avatar) || null;
+    var dcUsername = (profile && profile.discord_username) || null;
+
+    // Also try to get from API if provider_token available (to keep info fresh)
+    var providerToken = session.provider_token;
+    if (providerToken) {
+        try {
+            var dcRes = await fetch('https://discord.com/api/v10/users/@me', {
+                headers: { 'Authorization': 'Bearer ' + providerToken }
+            });
+            if (dcRes.ok) {
+                var discordInfo = await dcRes.json();
+                discordId = discordInfo.id;
+                avatarHash = discordInfo.avatar || null;
+                dcUsername = discordInfo.username || dcUsername;
+                var { error: dcUpsertErr } = await sb.from('profiles').upsert({
+                    id: user.id,
+                    discord_id: discordInfo.id,
+                    avatar: discordInfo.avatar || null,
+                    discord_username: discordInfo.username || null
+                }, { onConflict: 'id' });
+                if (dcUpsertErr) console.error('Dashboard Discord upsert error:', dcUpsertErr);
+            }
+        } catch (e) {}
+    }
+
+    // Build avatar URL
+    var avatarUrl = null;
+    if (discordId && avatarHash) {
+        var ext = avatarHash.startsWith('a_') ? 'gif' : 'png';
+        avatarUrl = 'https://cdn.discordapp.com/avatars/' + discordId + '/' + avatarHash + '.' + ext + '?size=128';
+    }
+
+    // Sidebar avatar
+    if (avatarUrl) {
+        document.getElementById('sb-av').innerHTML = '<img src="/' + avatarUrl + '" alt="av" />';
+    }
+
+    // Sidebar name
+    document.getElementById('sb-name').textContent = displayName;
+
+    // Profile card
+    if (avatarUrl) {
+        document.getElementById('profile-av').innerHTML = '<img src="/' + avatarUrl + '" alt="av" />';
+    }
+    document.getElementById('profile-name').textContent = displayName;
+    document.getElementById('info-user').textContent = displayName;
+
+    if (discordId) {
+        document.getElementById('profile-tag').textContent = 'Discord Verified';
+        document.getElementById('info-id').textContent = discordId;
+    } else {
+        document.getElementById('profile-tag').textContent = 'Link your Discord to complete setup';
+        document.getElementById('info-id').textContent = 'Not linked';
+    }
+
+    // Member since
+    var created = new Date(user.created_at);
+    document.getElementById('info-since').textContent = created.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+    // Discord Account card
+    var dcBody = document.getElementById('dc-body');
+    if (discordId && dcUsername) {
+        var avHtml = avatarUrl
+            ? '<img src="/' + avatarUrl + '" alt="dc" />'
+            : '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.79 19.79 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.865-.608 1.25-1.845-.277-3.68-.277-5.487 0-.163-.393-.406-.874-.618-1.25a.077.077 0 00-.079-.037A19.74 19.74 0 00.495 4.37a.07.07 0 00-.032.028C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057c2.053 1.508 4.041 2.423 5.993 3.029a.078.078 0 00.084-.028c.462-.63.873-1.295 1.226-1.994a.076.076 0 00-.042-.106c-.653-.248-1.274-.55-1.872-.892a.077.077 0 01-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 01.078-.011c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 01.079.01c.12.098.245.197.373.292a.077.077 0 01-.006.127 12.3 12.3 0 01-1.873.892.076.076 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028c1.961-.607 3.95-1.522 6.002-3.029a.077.077 0 00.032-.055c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.029zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>';
+
+        dcBody.innerHTML =
+            '<div class="dc-row">' +
+                '<div class="dc-av">' + avHtml + '</div>' +
+                '<div class="dc-info">' +
+                    '<div class="dc-name">' + dcUsername + '</div>' +
+                    '<div class="dc-id">Discord ID: ' + discordId + '</div>' +
+                '</div>' +
+                '<button class="dc-unlink" id="btn-unlink">Unlink</button>' +
+            '</div>';
+
+        document.getElementById('btn-unlink').addEventListener('click', async function () {
+            var { error: unErr } = await sb.from('profiles').update({ discord_id: null, avatar: null, discord_username: null }).eq('id', user.id);
+            if (unErr) console.error('Unlink error:', unErr);
+            window.location.reload();
+        });
+    } else {
+        dcBody.innerHTML = '<p style="color:#555;font-size:0.85rem;margin-bottom:14px;">No Discord account linked yet.</p><a href="#" class="dc-link-btn" id="btn-link-dc"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.79 19.79 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.865-.608 1.25-1.845-.277-3.68-.277-5.487 0-.163-.393-.406-.874-.618-1.25a.077.077 0 00-.079-.037A19.74 19.74 0 00.495 4.37a.07.07 0 00-.032.028C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057c2.053 1.508 4.041 2.423 5.993 3.029a.078.078 0 00.084-.028c.462-.63.873-1.295 1.226-1.994a.076.076 0 00-.042-.106c-.653-.248-1.274-.55-1.872-.892a.077.077 0 01-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 01.078-.011c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 01.079.01c.12.098.245.197.373.292a.077.077 0 01-.006.127 12.3 12.3 0 01-1.873.892.076.076 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028c1.961-.607 3.95-1.522 6.002-3.029a.077.077 0 00.032-.055c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.029z"/></svg> Link Discord Account</a>';
+        document.getElementById('btn-link-dc').addEventListener('click', function (e) {
+            e.preventDefault();
+            sb.auth.signInWithOAuth({
+                provider: 'discord',
+                options: {
+                    redirectTo: window.location.origin + '/discord-callback.html',
+                    scopes: 'identify guilds'
+                }
+            });
+        });
+    }
+
+    // Password form
+    var pwForm = document.getElementById('pw-form');
+    if (pwForm) {
+        pwForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            var msg = document.getElementById('pw-msg');
+            var { error } = await sb.auth.updateUser({
+                password: document.getElementById('pw-new').value
+            });
+            msg.style.display = 'block';
+            msg.style.color = error ? '#ef4444' : '#10b981';
+            msg.textContent = error ? (error.message || 'Failed.') : 'Password updated.';
+            document.getElementById('pw-new').value = '';
+        });
+    }
+
+    // License key formatter: ****-****-****-****
+    var redeemInput = document.getElementById('redeem-key');
+    if (redeemInput) {
+        redeemInput.addEventListener('input', function () {
+            var raw = this.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+            var result = '';
+            for (var i = 0; i < raw.length && i < 16; i++) {
+                if (i > 0 && i % 4 === 0) result += '-';
+                result += raw[i];
+            }
+            this.value = result;
+        });
+    }
+
+    // Redeem key button
+    var redeemBtn = document.getElementById('redeem-btn');
+    if (redeemBtn) {
+        redeemBtn.addEventListener('click', async function () {
+            var key = redeemInput.value.trim();
+            var msg = document.getElementById('redeem-msg');
+            if (!key) { msg.style.display='block'; msg.style.color='#ef4444'; msg.textContent='Enter a license key.'; return; }
+            redeemBtn.disabled = true;
+            redeemBtn.textContent = 'Redeeming...';
+
+            var { data: keyData, error: keyErr } = await sb
+                .from('license_keys')
+                .select('*')
+                .eq('key', key)
+                .eq('used', false)
+                .single();
+
+            if (keyErr || !keyData) {
+                msg.style.display = 'block'; msg.style.color = '#ef4444';
+                msg.textContent = 'Invalid or already used license key.';
+                redeemBtn.disabled = false; redeemBtn.textContent = 'Redeem Key';
+                return;
+            }
+
+            await sb.from('license_keys').update({ used: true, used_by: user.id }).eq('id', keyData.id);
+
+            msg.style.display = 'block'; msg.style.color = '#10b981';
+            msg.textContent = 'Key redeemed successfully!';
+            redeemBtn.disabled = false; redeemBtn.textContent = 'Redeem Key';
+            redeemInput.value = '';
+
+            var licensesList = document.getElementById('sub-licenses-list');
+            var emptyMsg = licensesList.querySelector('.sub-empty');
+            if (emptyMsg) emptyMsg.remove();
+            var row = document.createElement('div');
+            row.className = 'sub-license-row';
+            row.innerHTML = '<div><div class="sub-license-key">' + key + '</div><div class="sub-license-product">' + (keyData.product || 'Vade') + '</div></div><span class="sub-license-active">Active</span>';
+            licensesList.appendChild(row);
+        });
+    }
+
+    // Load existing licenses
+    var { data: userKeys } = await sb.from('license_keys').select('key, product').eq('used_by', user.id);
+    if (userKeys && userKeys.length > 0) {
+        var licensesList = document.getElementById('sub-licenses-list');
+        var emptyMsg = licensesList.querySelector('.sub-empty');
+        if (emptyMsg) emptyMsg.remove();
+        userKeys.forEach(function (k) {
+            var row = document.createElement('div');
+            row.className = 'sub-license-row';
+            row.innerHTML = '<div><div class="sub-license-key">' + k.key + '</div><div class="sub-license-product">' + (k.product || 'Vade') + '</div></div><span class="sub-license-active">Active</span>';
+            licensesList.appendChild(row);
+        });
+    }
+})();
+</script>
+    <script defer src="/logo-data.js?v=11"></script>
+
+</body>
+</html>

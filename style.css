@@ -3681,3 +3681,11 @@ footer {
     outline: 2px solid var(--accent-color);
     outline-offset: 2px;
 }
+
+/* -- Page transition (instant-nav layer in main.js) -- */
+body { transition: opacity 0.14s ease; }
+body.nav-exit { opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+    body { transition: none; }
+    body.nav-exit { opacity: 1; }
+}

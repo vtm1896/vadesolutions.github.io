@@ -1,0 +1,2017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Vade - Admin Panel</title>
+    <link rel="icon" type="image/png" href="/NEW_VADE_LOGO-removebg-preview.png?v=11">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Vade">
+    <meta property="og:title" content="Vade - Admin Panel">
+    <meta property="og:description" content="Vade - premium, reliable toolset built for performance, security, and a seamless experience.">
+    <meta property="og:url" content="https://vadesolutions.fun/admin/">
+    <meta property="og:image" content="https://vadesolutions.fun/NEW_VADE_LOGO-removebg-preview.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="theme-color" content="#050505">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css?v=11">
+    <style>
+        .admin-shell { max-width: 1060px; margin: 0 auto; padding: 120px 20px 80px; }
+
+        /* Sidebar layout */
+        .admin-layout { display: grid; grid-template-columns: 232px 1fr; gap: 26px; align-items: start; }
+        .admin-side { position: sticky; top: 100px; background: #0d0d0d; border: 1px solid var(--border-color); border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 3px; }
+        .admin-side-brand { display: flex; align-items: center; gap: 9px; font-weight: 700; font-size: 0.95rem; padding: 6px 10px 14px; border-bottom: 1px solid var(--border-color); margin-bottom: 8px; letter-spacing: -0.02em; }
+        .admin-side-brand .brand-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-color); box-shadow: 0 0 10px var(--accent-color); flex-shrink: 0; }
+        .admin-nav { display: flex; flex-direction: column; gap: 3px; }
+        .admin-nav-btn { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: transparent; border: none; color: var(--text-secondary); font-family: var(--font-main); font-size: 0.88rem; font-weight: 600; padding: 10px 12px; border-radius: 9px; cursor: pointer; transition: background 0.15s, color 0.15s; }
+        .admin-nav-btn:hover { background: rgba(255,255,255,0.04); color: var(--text-primary); }
+        .admin-nav-btn.active { background: rgba(139,92,246,0.12); color: #fff; }
+        .admin-nav-btn.active svg { color: var(--accent-color); opacity: 1; }
+        .admin-nav-btn svg { opacity: 0.6; flex-shrink: 0; }
+        .admin-nav-btn[hidden] { display: none; }
+        .admin-nav-badge { margin-left: auto; background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); font-size: 0.66rem; font-weight: 700; padding: 1px 8px; border-radius: 999px; color: var(--text-secondary); }
+        .admin-side-foot { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-color); }
+        .admin-main { min-width: 0; }
+
+        .admin-head { margin-bottom: 24px; }
+        .admin-head h1 { font-size: 1.65rem; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 6px; }
+        .admin-head p { color: var(--text-secondary); font-size: 0.93rem; }
+        .admin-me { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; background: #0a0a0a; border: 1px solid var(--border-color); border-radius: 999px; padding: 6px 14px 6px 8px; font-size: 0.78rem; color: var(--text-secondary); max-width: 100%; flex-wrap: wrap; }
+        .admin-me strong { color: var(--text-primary); font-weight: 600; }
+
+        /* Stat tiles */
+        .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 14px; }
+        .stat-card { background: #0d0d0d; border: 1px solid var(--border-color); border-radius: 14px; padding: 16px; }
+        .stat-label { font-size: 0.66rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 10px; }
+        .stat-val { font-size: 1.7rem; font-weight: 700; letter-spacing: -0.03em; line-height: 1; }
+        .stat-val.good { color: var(--status-online); }
+        .stat-val.bad { color: var(--status-offline); }
+        .stat-sub { font-size: 0.73rem; color: var(--text-secondary); margin-top: 7px; }
+
+        .mini-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; background: #0a0a0a; border: 1px solid var(--border-color); border-radius: 10px; margin-bottom: 8px; }
+        .mini-row:last-child { margin-bottom: 0; }
+        .mini-info { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+        .mini-name { font-weight: 600; font-size: 0.88rem; }
+        .mini-game { font-size: 0.73rem; color: var(--text-secondary); }
+        .mini-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+        /* One-click status chips */
+        .status-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+        .status-chip { display: inline-flex; align-items: center; gap: 6px; background: #0a0a0a; border: 1px solid var(--border-color); color: var(--text-secondary); font-family: var(--font-main); font-size: 0.76rem; font-weight: 600; padding: 7px 13px; border-radius: 999px; cursor: pointer; transition: background 0.15s, border-color 0.15s, color 0.15s; }
+        .status-chip .chip-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+        .status-chip:hover { border-color: var(--border-hover); color: var(--text-primary); }
+        .status-chip:disabled { opacity: 0.5; cursor: wait; }
+        .status-chip.chip-online { color: var(--status-online); }
+        .status-chip.chip-updating { color: var(--status-updating); }
+        .status-chip.chip-offline { color: var(--status-offline); }
+        .status-chip.chip-online.active { background: rgba(16,185,129,0.12); border-color: rgba(16,185,129,0.45); }
+        .status-chip.chip-updating.active { background: rgba(245,158,11,0.12); border-color: rgba(245,158,11,0.45); }
+        .status-chip.chip-offline.active { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.45); }
+
+        /* Staff toolbar */
+        .staff-toolbar { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+        .staff-toolbar .admin-input { flex: 1; min-width: 180px; }
+        .staff-toolbar .admin-select { width: auto; min-width: 150px; }
+
+        .admin-head { margin-bottom: 28px; }
+        .admin-me { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; background: #0d0d0d; border: 1px solid var(--border-color); border-radius: 999px; padding: 6px 14px 6px 8px; font-size: 0.82rem; color: var(--text-secondary); }
+        .admin-me strong { color: var(--text-primary); font-weight: 600; }
+
+        .admin-panel { display: none; }
+        .admin-panel.active { display: block; }
+
+        .admin-card { background: #0d0d0d; border: 1px solid var(--border-color); border-radius: 14px; padding: 20px; margin-bottom: 14px; }
+        .admin-card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+        .admin-card-title { font-size: 1rem; font-weight: 700; }
+        .admin-card-sub { font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px; }
+
+        .admin-status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 11px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em; }
+        .admin-status-pill.online { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: var(--status-online); }
+        .admin-status-pill.offline { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: var(--status-offline); }
+        .admin-status-pill.updating { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); color: var(--status-updating); }
+
+        .admin-field { margin-bottom: 12px; }
+        .admin-label { display: block; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 6px; }
+        .admin-input, .admin-select, .admin-textarea { width: 100%; background: #0a0a0a; border: 1px solid var(--border-color); color: var(--text-primary); padding: 10px 12px; border-radius: 8px; font-family: var(--font-main); font-size: 0.88rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+        .admin-input:focus, .admin-select:focus, .admin-textarea:focus { border-color: rgba(139,92,246,0.55); box-shadow: 0 0 0 3px rgba(139,92,246,0.1); }
+        .admin-textarea { min-height: 72px; resize: vertical; }
+        .admin-select { cursor: pointer; }
+        .admin-select option { background: #0a0a0a; }
+
+        .admin-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+        .admin-row .admin-field { flex: 1; min-width: 140px; margin-bottom: 0; }
+
+        .admin-btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; background: var(--accent-color); color: #fff; border: none; padding: 10px 16px; border-radius: 8px; font-family: var(--font-main); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: background 0.2s, box-shadow 0.2s; white-space: nowrap; }
+        .admin-btn:hover { background: var(--accent-hover); box-shadow: 0 0 18px rgba(139,92,246,0.3); }
+        .admin-btn:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+        .admin-btn.ghost { background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); }
+        .admin-btn.ghost:hover { color: var(--text-primary); border-color: var(--border-hover); box-shadow: none; background: rgba(255,255,255,0.03); }
+        .admin-btn.danger { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); color: #f87171; }
+        .admin-btn.danger:hover { background: rgba(239,68,68,0.2); box-shadow: none; }
+        .admin-btn.sm { padding: 7px 12px; font-size: 0.78rem; }
+
+        .admin-toast { position: fixed; bottom: 24px; right: 24px; z-index: 30000; background: #111; border: 1px solid rgba(16,185,129,0.35); color: var(--status-online); padding: 12px 18px; border-radius: 10px; font-size: 0.88rem; font-weight: 600; box-shadow: 0 10px 40px rgba(0,0,0,0.5); opacity: 0; transform: translateY(10px); transition: opacity 0.25s, transform 0.25s; pointer-events: none; }
+        .admin-toast.show { opacity: 1; transform: translateY(0); }
+        .admin-toast.error { border-color: rgba(239,68,68,0.35); color: #f87171; }
+
+        .cl-entry { background: #0a0a0a; border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; margin-bottom: 10px; }
+        .cl-entry-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
+        .cl-entry-ver { font-weight: 700; font-size: 0.92rem; }
+        .cl-entry-meta { font-size: 0.75rem; color: var(--text-secondary); }
+        .cl-entry-title { font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 8px; }
+        .cl-entry-items { list-style: none; display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+        .cl-entry-items li { display: flex; align-items: flex-start; gap: 8px; font-size: 0.82rem; color: #c8c8c8; line-height: 1.5; }
+        .cl-tag { flex-shrink: 0; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; margin-top: 2px; }
+        .cl-tag.added { background: rgba(16,185,129,0.14); border: 1px solid rgba(16,185,129,0.35); color: var(--status-online); }
+        .cl-tag.fixed { background: rgba(59,130,246,0.14); border: 1px solid rgba(59,130,246,0.35); color: #60a5fa; }
+        .cl-tag.changed { background: rgba(245,158,11,0.14); border: 1px solid rgba(245,158,11,0.35); color: var(--status-updating); }
+        .cl-tag.removed { background: rgba(239,68,68,0.14); border: 1px solid rgba(239,68,68,0.35); color: var(--status-offline); }
+
+        .cl-item-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+        .cl-item-row .admin-select { width: 110px; flex-shrink: 0; }
+        .cl-item-row .admin-input { flex: 1; }
+        .cl-item-remove { background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); width: 34px; height: 38px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; transition: color 0.2s, border-color 0.2s; }
+        .cl-item-remove:hover { color: #f87171; border-color: rgba(239,68,68,0.4); }
+
+        .admin-empty { text-align: center; color: var(--text-secondary); font-size: 0.88rem; padding: 28px 12px; }
+        .admin-note { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.55; background: rgba(139,92,246,0.06); border: 1px solid rgba(139,92,246,0.15); border-radius: 10px; padding: 12px 14px; margin-bottom: 16px; }
+
+        .staff-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; background: #0a0a0a; border: 1px solid var(--border-color); border-radius: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+        .staff-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+        .staff-name { font-weight: 600; font-size: 0.9rem; }
+        .staff-id { font-size: 0.72rem; color: var(--text-secondary); font-family: monospace; }
+        .staff-actions { display: flex; align-items: center; gap: 8px; }
+        .staff-actions .admin-select { width: auto; min-width: 120px; }
+
+        .admin-lock { text-align: center; padding: 80px 20px; color: var(--text-secondary); }
+        .admin-lock h2 { color: var(--text-primary); font-size: 1.3rem; margin-bottom: 8px; }
+
+        /* Sidebar footer pill — column so name+badge never overflow */
+        .admin-side-foot .admin-me { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; width: 100%; margin-top: 0; border-radius: 12px; padding: 10px 12px; background: #0a0a0a; box-sizing: border-box; }
+        .admin-me-label { font-size: 0.66rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-secondary); }
+        .admin-me-row { display: flex; align-items: center; gap: 8px; min-width: 0; max-width: 100%; }
+        .admin-me-row strong { color: var(--text-primary); font-weight: 600; font-size: 0.88rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+        .admin-me-row .user-role-badge { flex-shrink: 0; }
+
+        /* Nav group labels */
+        .admin-nav-group { font-size: 0.64rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-secondary); padding: 12px 12px 5px; opacity: 0.75; }
+
+        /* Price editor */
+        .price-plan-row { display: grid; grid-template-columns: 1.1fr 1.1fr 88px 1.5fr 34px; gap: 8px; align-items: center; margin-bottom: 8px; }
+        .price-plan-row .admin-input { padding: 8px 10px; font-size: 0.84rem; }
+        .price-remove { background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); width: 34px; height: 36px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: color 0.2s, border-color 0.2s; }
+        .price-remove:hover { color: #f87171; border-color: rgba(239,68,68,0.4); }
+        .price-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+
+        /* Generic list rows (orders / coupons / licenses / audit) */
+        .data-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 14px; background: #0a0a0a; border: 1px solid var(--border-color); border-radius: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+        .data-row:last-child { margin-bottom: 0; }
+        .data-left { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+        .data-title { font-weight: 600; font-size: 0.88rem; overflow: hidden; text-overflow: ellipsis; }
+        .data-sub { font-size: 0.73rem; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; }
+        .rev-stars { color: #f59e0b; letter-spacing: 1px; }
+        .data-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+        .data-amount { font-weight: 700; font-size: 0.92rem; font-variant-numeric: tabular-nums; }
+        .mono { font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; }
+        .tag { display: inline-flex; align-items: center; font-size: 0.64rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; padding: 3px 8px; border-radius: 5px; border: 1px solid; }
+        .tag.paid, .tag.active, .tag.valid { background: rgba(16,185,129,0.12); border-color: rgba(16,185,129,0.35); color: var(--status-online); }
+        .tag.refunded, .tag.revoked, .tag.invalid, .tag.expired { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.35); color: var(--status-offline); }
+        .tag.pending, .tag.warn { background: rgba(245,158,11,0.12); border-color: rgba(245,158,11,0.35); color: var(--status-updating); }
+        .tag.neutral { background: rgba(255,255,255,0.05); border-color: var(--border-color); color: var(--text-secondary); }
+
+        /* Audit rows */
+        .audit-row { display: flex; gap: 12px; padding: 10px 14px; background: #0a0a0a; border: 1px solid var(--border-color); border-radius: 10px; margin-bottom: 6px; align-items: baseline; flex-wrap: wrap; }
+        .audit-time { font-size: 0.7rem; color: var(--text-secondary); font-family: ui-monospace, Consolas, monospace; white-space: nowrap; }
+        .audit-actor { font-weight: 700; font-size: 0.82rem; }
+        .audit-action { font-size: 0.66rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; padding: 2px 7px; border-radius: 5px; background: rgba(139,92,246,0.14); border: 1px solid rgba(139,92,246,0.35); color: #a78bfa; white-space: nowrap; }
+        .audit-detail { font-size: 0.8rem; color: #c8c8c8; flex: 1; min-width: 160px; }
+
+        /* License keys */
+        .license-key { font-family: ui-monospace, Consolas, monospace; font-size: 0.84rem; letter-spacing: 0.02em; background: #111; border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 7px; word-break: break-all; }
+        .license-out { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+        .lookup-result { display: flex; flex-direction: column; gap: 8px; padding: 16px; background: #0a0a0a; border: 1px solid var(--border-color); border-radius: 12px; }
+        .lookup-line { display: flex; justify-content: space-between; gap: 12px; font-size: 0.85rem; flex-wrap: wrap; }
+        .lookup-line span:first-child { color: var(--text-secondary); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; }
+
+        @media (max-width: 900px) {
+            .admin-layout { grid-template-columns: 1fr; }
+            .admin-side { position: static; flex-direction: row; align-items: center; overflow-x: auto; padding: 10px; gap: 6px; scrollbar-width: none; }
+            .admin-side::-webkit-scrollbar { display: none; }
+            .admin-side-brand { border-bottom: none; border-right: 1px solid var(--border-color); padding: 4px 14px 4px 8px; margin: 0 4px 0 0; flex-shrink: 0; }
+            .admin-nav { flex-direction: row; gap: 4px; }
+            .admin-nav-btn { white-space: nowrap; width: auto; padding: 8px 13px; }
+            .admin-nav-badge, .admin-side-foot { display: none; }
+            .admin-nav-group { display: none; }
+            .stat-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 600px) {
+            .admin-shell { padding: 100px 16px 60px; }
+            .admin-row { flex-direction: column; align-items: stretch; }
+            .stat-grid { grid-template-columns: 1fr 1fr; }
+            .staff-toolbar .admin-input, .staff-toolbar .admin-select { min-width: 0; width: 100%; }
+            .price-plan-row { grid-template-columns: 1fr 1fr 74px 34px; }
+            .price-plan-row .price-link { grid-column: 1 / -1; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <img src="" alt="Vade" class="logo-img" id="nav-logo">
+            </a>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/products/">Products</a>
+                <a href="/status/">Status</a>
+                <a href="/rate/">Rate Us</a>
+            </div>
+            <div class="nav-actions">
+                <div class="nav-online">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1" fill="currentColor"/></svg>
+                    <span id="online-count">0 online</span>
+                </div>
+                <a href="#" class="btn-resell">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    Resell
+                </a>
+                <a href="/dashboard/" class="btn-signin">Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="admin-shell">
+        <div id="admin-denied" class="admin-lock" hidden>
+            <h2>Access denied</h2>
+            <p>You need a staff account to view the admin panel.</p>
+        </div>
+
+        <div id="admin-app" hidden>
+            <div class="admin-layout">
+                <aside class="admin-side">
+                    <div class="admin-side-brand"><span class="brand-dot"></span>Vade Control</div>
+                    <nav class="admin-nav">
+                        <div class="admin-nav-group">General</div>
+                        <button class="admin-nav-btn active" data-tab="overview">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                            Overview
+                        </button>
+                        <button class="admin-nav-btn" data-tab="lookup">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                            User Lookup
+                        </button>
+
+                        <div class="admin-nav-group">Products</div>
+                        <button class="admin-nav-btn" data-tab="products">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                            Products <span class="admin-nav-badge" id="nav-badge-products">—</span>
+                        </button>
+                        <button class="admin-nav-btn" data-tab="prices">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.83z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                            Prices
+                        </button>
+                        <button class="admin-nav-btn" data-tab="scheduler">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>
+                            Maintenance
+                        </button>
+                        <button class="admin-nav-btn" data-tab="changelog">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            Changelog <span class="admin-nav-badge" id="nav-badge-cl">—</span>
+                        </button>
+
+                        <div class="admin-nav-group">Store</div>
+                        <button class="admin-nav-btn" data-tab="orders">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                            Orders
+                        </button>
+                        <button class="admin-nav-btn" data-tab="coupons">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 5H3a2 2 0 0 0-2 2v2.5a2.5 2.5 0 0 1 0 5V17a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2v-2.5a2.5 2.5 0 0 1 0-5V7a2 2 0 0 0-2-2z"/><line x1="9" y1="5" x2="9" y2="19" stroke-dasharray="2 3"/></svg>
+                            Coupons
+                        </button>
+                        <button class="admin-nav-btn" data-tab="licenses">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+                            Licenses
+                        </button>
+                        <button class="admin-nav-btn" data-tab="reviews">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            Reviews <span class="admin-nav-badge" id="nav-badge-reviews">—</span>
+                        </button>
+
+                        <div class="admin-nav-group">Admin</div>
+                        <button class="admin-nav-btn" data-tab="audit">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
+                            Audit Log
+                        </button>
+                        <button class="admin-nav-btn" data-tab="staff" id="tab-staff" hidden>
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            Users &amp; Roles
+                        </button>
+                    </nav>
+                    <div class="admin-side-foot">
+                        <div class="admin-me">
+                            <span class="admin-me-label">Signed in as</span>
+                            <span class="admin-me-row">
+                                <strong id="admin-me-name">—</strong>
+                                <span class="user-role-badge" id="admin-me-role">—</span>
+                            </span>
+                        </div>
+                    </div>
+                </aside>
+
+                <div class="admin-main">
+                    <div class="admin-head">
+                        <h1 id="admin-title">Overview</h1>
+                        <p id="admin-sub">Everything happening across Vade, at a glance.</p>
+                    </div>
+
+                    <!-- OVERVIEW -->
+                    <section class="admin-panel active" id="panel-overview">
+                        <div class="stat-grid">
+                            <div class="stat-card">
+                                <div class="stat-label">Products online</div>
+                                <div class="stat-val good" id="st-online">—</div>
+                                <div class="stat-sub" id="st-online-sub">of — products</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Products down</div>
+                                <div class="stat-val bad" id="st-offline">—</div>
+                                <div class="stat-sub" id="st-offline-sub">— updating</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Registered users</div>
+                                <div class="stat-val" id="st-users">—</div>
+                                <div class="stat-sub" id="st-users-sub">— staff members</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Patch notes</div>
+                                <div class="stat-val" id="st-notes">—</div>
+                                <div class="stat-sub">published entries</div>
+                            </div>
+                        </div>
+
+                        <div class="admin-card">
+                            <div class="admin-card-head">
+                                <div>
+                                    <div class="admin-card-title">Product health</div>
+                                    <div class="admin-card-sub">Click manage to change status or description</div>
+                                </div>
+                            </div>
+                            <div id="ov-products"><div class="admin-empty">Loading…</div></div>
+                        </div>
+
+                        <div class="admin-card">
+                            <div class="admin-card-head">
+                                <div>
+                                    <div class="admin-card-title">Latest patch notes</div>
+                                    <div class="admin-card-sub">Newest entries across all products</div>
+                                </div>
+                            </div>
+                            <div id="ov-notes"><div class="admin-empty">Loading…</div></div>
+                        </div>
+                    </section>
+
+                    <!-- USER LOOKUP -->
+                    <section class="admin-panel" id="panel-lookup">
+                        <div class="admin-note">Search registered accounts by username, Discord ID, or account UUID. Roles are view-only here — change them in <strong>Users &amp; Roles</strong>.</div>
+                        <div class="admin-card">
+                            <div class="admin-card-head">
+                                <div>
+                                    <div class="admin-card-title">Find a user</div>
+                                    <div class="admin-card-sub">Exact match on username, Discord ID, or UUID</div>
+                                </div>
+                            </div>
+                            <div class="staff-toolbar">
+                                <input class="admin-input" id="lookup-input" placeholder="username / discord id / uuid…" autocomplete="off">
+                                <button type="button" class="admin-btn" id="lookup-find">Find</button>
+                            </div>
+                            <div id="lookup-out"></div>
+                        </div>
+                    </section>
+
+                    <!-- PRICES -->
+                    <section class="admin-panel" id="panel-prices">
+                        <div class="admin-note">Plan prices and buy links feed the public product pages instantly after saving. Price in dollars, link points at your SellAuth/Gumroad checkout.</div>
+                        <div id="prices-list">
+                            <div class="admin-empty">Loading prices…</div>
+                        </div>
+                    </section>
+
+                    <!-- MAINTENANCE SCHEDULER -->
+                    <section class="admin-panel" id="panel-scheduler">
+                        <div class="admin-note">Starting maintenance flips the product to <strong>Offline</strong> immediately. Once the chosen time passes, it auto-reverts to <strong>Online</strong> — on the next status page load or admin boot.</div>
+                        <div class="admin-card">
+                            <div class="admin-card-head">
+                                <div>
+                                    <div class="admin-card-title">Start maintenance window</div>
+                                    <div class="admin-card-sub">Product goes offline now, reverts at the time below</div>
+                                </div>
+                            </div>
+                            <div class="admin-row" style="margin-bottom:14px;">
+                                <div class="admin-field">
+                                    <label class="admin-label">Product</label>
+                                    <select class="admin-select" id="sched-product"></select>
+                                </div>
+                                <div class="admin-field">
+                                    <label class="admin-label">Revert at</label>
+                                    <input class="admin-input" id="sched-until" type="datetime-local">
+                                </div>
+                                <div class="admin-field">
+                                    <label class="admin-label">Reason (optional)</label>
+                                    <input class="admin-input" id="sched-note" placeholder="DB rotation, patch deploy…" autocomplete="off">
+                                </div>
+                            </div>
+                            <button type="button" class="admin-btn" id="sched-start">Start maintenance</button>
+                        </div>
+                        <div class="admin-card">
+                            <div class="admin-card-head">
+                                <div>
+                                    <div class="admin-card-title">Scheduled &amp; active windows</div>
+                                    <div class="admin-card-sub" id="sched-count">—</div>
+                                </div>
+                                <button type="button" class="admin-btn ghost sm" id="sched-revert">Run auto-revert now</button>
+                            </div>
+                            <div id="sched-list"><div class="admin-empty">No maintenance windows.</div></div>
+                        </div>
+                    </section>
+
+                    <!-- ORDERS -->
+                    <section class="admin-panel" id="panel-orders">
+                        <div class="admin-note">Log sales from anywhere — SellAuth, manual Discord sales, anything. Revenue tiles count paid orders only.</div>
+                        <div class="stat-grid">
+                            <div class="stat-card">
+                                <div class="stat-label">Total revenue</div>
+                                <div class="stat-val" id="ord-rev">—</div>
+                                <div class="stat-sub">all paid orders</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Last 30 days</div>
+                                <div class="stat-val" id="ord-rev30">—</div>
+                                <div class="stat-sub">rolling window</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Paid orders</div>
+                                <div class="stat-val" id="ord-paid">—</div>
+                                <div class="stat-sub">lifetime count</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Refunded</div>
+                                <div class="stat-val bad" id="ord-ref">—</div>
+                                <div class="stat-sub" id="ord-ref-sub">—</div>
+                            </div>
+                        </div>
+                        <div class="admin-card">
+                            <div class="admin-card-head">
+                                <div>
+                                    <div class="admin-card-title">Log an order</div>
+                                    <div class="admin-card-sub">Records a sale and updates the revenue tiles</div>
+                                </div>
+                            </div>
+                            <div class="admin-row" style="margin-bottom:10px;">
+                                <div class="admin-field">
+                                    <label class="admin-label">Product</label>
+                                    <select class="admin-select" id="ord-product"></select>
+                                </div>
+                                <div class="admin-field">
+                                    <label class="admin-label">Plan</label>
+                                    <input class="admin-input" id="ord-plan" placeholder="7 Days" autocomplete="off">
+                                </div>
+                                <div class="admin-field">
+                                    <label class="admin-label">Amount ($)</label>
+                                    <input class="admin-input" id="ord-amount" type="number" min="0" step="0.01" placeholder="35.00">
+                                </div>
+                            </div>
+                            <div class="admin-row" style="margin-bottom:14px;">
+                                <div class="admin-field">
+                                    <label class="admin-label">Customer</label>
+                                    <input class="admin-input" id="ord-customer" placeholder="username" autocomplete="off">
+                                </div>
+                                <div class="admin-field">
+                                    <label class="admin-label">Discord ID (optional)</label>
+                                    <input class="admin-input" id="ord-discord" placeholder="123456789012345678" autocomplete="off">
+                                </div>
+                                <div class="admin-field">
+                                    <label class="admin-label">Status</label>
+                                    <select class="admin-select" id="ord-status">
+                                        <option value="paid">Paid</option>
+                                        <option value="pending">Pending</option>
+                                        <option value="refunded">Refunded</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="button" class="admin-btn" id="ord-add">Log order</button>
+                        </div>
+                        <div class="admin-card">
+                            <div class="admin-card-head">
+                                <div>
+                                    <div class="admin-card-title">Recent orders</div>
+                                    <div class="admin-card-sub" id="ord-list-count">—</div>
+                                </div>
+                            </div>
+                            <div id="ord-list"><div class="admin-empty">No orders yet.</div></div>
+                        </div>
+                    </section>
+
+                    <!-- COUPONS -->
+                    <section class="admin-panel" id="panel-coupons">
+                        <div class="admin-note">Discount codes live in the coupons table. Usage caps and expiry are enforced at redemption — keep this list clean.</div>
+                        <div class="admin-card">
+                            <div class="admin-card-head">
+                                <div>
+                                    <div class="admin-card-title">Create coupon</div>
+                                    <div class="admin-card-sub">Percent off or a fixed dollar amount</div>
+                                </div>
+                            </div>
+                            <div class="admin-row" style="margin-bottom:10px;">
+                                <div class="admin-field">
+                                    <label class="admin-label">Code</label>
+                                    <input class="admin-input" id="cpl-code" placeholder="LAUNCH20" autocomplete="off">
+                                </div>
+                                <div class="admin-field">
+                                    <label class="admin-label">Type</label>
+                                    <select class="admin-select" id="cpl-type">
+                                        <option value="percent">Percent %</option>
+                                        <option value="fixed">Fixed $</option>
+                                    </select>
+                                </div>
+                                <div class="admin-field">
+                                    <label class="admin-label">Value</label>
+                                    <input class="admin-input" id="cpl-value" type="number" min="0" step="0.01" placeholder="20">
+                                </div>
+                            </div>
+                            <div class="admin-row" style="margin-bottom:14px;">
+                                <div class="admin-field">
+                                    <label class="admin-label">Scope</label>
+                                    <select class="admin-select" id="cpl-product"></select>
+                                </div>
+                                <div class="admin-field">
+                                    <label class="admin-label">Max uses (optional)</label>
+                                    <input class="admin-input" id="cpl-max" type="number" min="1" step="1" placeholder="unlimited">
+                                </div>
+                                <div class="admin-field">
+                                    <label class="admin-label">Expires (optional)</label>
+                                    <input class="admin-input" id="cpl-expires" type="datetime-local">
+                                </div>
+                            </div>
+                            <button type="button" class="admin-btn" id="cpl-create">Create coupon</button>
+                        </div>
+                        <div class="admin-card">
+                            <div class="admin-card-head">
+                                <div>
+                                    <div class="admin-card-title">Existing coupons</div>
+                                    <div class="admin-card-sub" id="cpl-count">—</div>
+                                </div>
+                            </div>
+                            <div id="cpl-list"><div class="admin-empty">No coupons yet.</div></div>
+                        </div>
+                    </section>
+
+                    <!-- LICENSES -->
+                    <section class="admin-panel" id="panel-licenses">
+                        <div id="lic-setup" hidden>
+                            <div class="admin-card">
+                                <div class="admin-card-head">
+                                    <div>
+                                        <div class="admin-card-title">KeyAuth proxy not configured</div>
+                                        <div class="admin-card-sub">Three steps and this panel is live</div>
+                                    </div>
+                                </div>
+                                <div class="admin-note" style="margin-bottom:0;">
+                                    1. Create <code class="mono">supabase/functions/keyauth-proxy/index.ts</code> (ships with this build) and run <code class="mono">supabase functions deploy keyauth-proxy</code><br>
+                                    2. Set function secrets: <code class="mono">KEYAUTH_NAME</code>, <code class="mono">KEYAUTH_OWNERID</code>, <code class="mono">KEYAUTH_ADMIN_USER</code>, <code class="mono">KEYAUTH_ADMIN_PASS</code><br>
+                                    3. Paste the function URL into <code class="mono">KEYAUTH_PROXY</code> in <code class="mono">config.js</code>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="lic-app" hidden>
+                            <div class="admin-note">Keys are created and revoked through the KeyAuth proxy — your KeyAuth admin credentials never touch the browser.</div>
+                            <div class="admin-card">
+                                <div class="admin-card-head">
+                                    <div>
+                                        <div class="admin-card-title">Generate keys</div>
+                                        <div class="admin-card-sub">Creates a batch and stores it in the licenses table</div>
+                                    </div>
+                                </div>
+                                <div class="admin-row" style="margin-bottom:14px;">
+                                    <div class="admin-field">
+                                        <label class="admin-label">Count (1–25)</label>
+                                        <input class="admin-input" id="lic-count" type="number" min="1" max="25" value="1">
+                                    </div>
+                                    <div class="admin-field">
+                                        <label class="admin-label">Prefix</label>
+                                        <input class="admin-input" id="lic-prefix" value="VADE-" autocomplete="off">
+                                    </div>
+                                    <div class="admin-field">
+                                        <label class="admin-label">Product</label>
+                                        <select class="admin-select" id="lic-product"></select>
+                                    </div>
+                                </div>
+                                <button type="button" class="admin-btn" id="lic-create">Generate keys</button>
+                                <div class="license-out" id="lic-out"></div>
+                            </div>
+                            <div class="admin-card">
+                                <div class="admin-card-head">
+                                    <div>
+                                        <div class="admin-card-title">Check a key</div>
+                                        <div class="admin-card-sub">Live status straight from KeyAuth</div>
+                                    </div>
+                                </div>
+                                <div class="staff-toolbar">
+                                    <input class="admin-input mono" id="lic-check-input" placeholder="VADE-XXXX-XXXX-XXXX" autocomplete="off">
+                                    <button type="button" class="admin-btn" id="lic-check">Check key</button>
+                                </div>
+                                <div id="lic-check-out"></div>
+                            </div>
+                            <div class="admin-card">
+                                <div class="admin-card-head">
+                                    <div>
+                                        <div class="admin-card-title">Generated keys</div>
+                                        <div class="admin-card-sub" id="lic-count-sub">—</div>
+                                    </div>
+                                </div>
+                                <div id="lic-list"><div class="admin-empty">No keys generated yet.</div></div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- REVIEWS -->
+                    <section class="admin-panel" id="panel-reviews">
+                        <div class="admin-note">Published reviews appear live on the homepage marquee and the rate page. Hidden reviews disappear from the public but stay in the table — restore anytime. One review per user per product.</div>
+                        <div class="admin-card">
+                            <div class="admin-card-head">
+                                <div>
+                                    <div class="admin-card-title">All reviews</div>
+                                    <div class="admin-card-sub" id="rev-count">—</div>
+                                </div>
+                                <div class="staff-toolbar" style="margin-bottom:0;">
+                                    <select class="admin-select" id="rev-filter" aria-label="Filter reviews">
+                                        <option value="all">All statuses</option>
+                                        <option value="published">Published</option>
+                                        <option value="hidden">Hidden</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div id="rev-list"><div class="admin-empty">Loading…</div></div>
+                        </div>
+                    </section>
+
+                    <!-- AUDIT LOG -->
+                    <section class="admin-panel" id="panel-audit">
+                        <div class="admin-note">Every admin action writes here — status flips, role changes, prices, orders, coupons, keys. Newest first, last 100 entries.</div>
+                        <div class="admin-card">
+                            <div class="admin-card-head">
+                                <div>
+                                    <div class="admin-card-title">Discord alerts</div>
+                                    <div class="admin-card-sub" id="hook-status">—</div>
+                                </div>
+                                <button type="button" class="admin-btn ghost sm" id="hook-test">Send test alert</button>
+                            </div>
+                        </div>
+                        <div class="admin-card">
+                            <div class="admin-card-head">
+                                <div>
+                                    <div class="admin-card-title">Activity</div>
+                                    <div class="admin-card-sub" id="audit-count">—</div>
+                                </div>
+                            </div>
+                            <div class="staff-toolbar">
+                                <input class="admin-input" id="audit-search" placeholder="Search action, target, detail…" autocomplete="off">
+                                <select class="admin-select" id="audit-filter">
+                                    <option value="all">All actions</option>
+                                    <option value="status">Status</option>
+                                    <option value="maintenance">Maintenance</option>
+                                    <option value="description">Description</option>
+                                    <option value="changelog">Changelog</option>
+                                    <option value="role">Roles</option>
+                                    <option value="price">Prices</option>
+                                    <option value="order">Orders</option>
+                                    <option value="coupon">Coupons</option>
+                                    <option value="license">Licenses</option>
+                                </select>
+                            </div>
+                            <div id="audit-list"><div class="admin-empty">No audit entries yet.</div></div>
+                        </div>
+                    </section>
+
+                    <!-- PRODUCTS -->
+                    <section class="admin-panel" id="panel-products">
+                <div class="admin-note">
+                    Status changes here show on the public <a href="/status/" style="color:var(--accent-color);">status page</a> immediately. Set a product to <strong>Offline</strong> or <strong>Updating</strong> when it goes down.
+                </div>
+                <div id="products-list">
+                    <div class="admin-empty">Loading products…</div>
+                </div>
+            </section>
+
+            <!-- CHANGELOG -->
+            <section class="admin-panel" id="panel-changelog">
+                <div class="admin-note">
+                    Patch notes shown when users click <strong>Changelog</strong> on the status page. Newest entries appear first on the public site.
+                </div>
+
+                <div class="admin-card">
+                    <div class="admin-card-head">
+                        <div>
+                            <div class="admin-card-title">Add patch note</div>
+                            <div class="admin-card-sub">Create a new changelog entry for a product</div>
+                        </div>
+                    </div>
+                    <div class="admin-row" style="margin-bottom:14px;">
+                        <div class="admin-field">
+                            <label class="admin-label">Product</label>
+                            <select class="admin-select" id="cl-product"></select>
+                        </div>
+                        <div class="admin-field">
+                            <label class="admin-label">Version</label>
+                            <input class="admin-input" id="cl-version" placeholder="v1.0.1" autocomplete="off">
+                        </div>
+                        <div class="admin-field">
+                            <label class="admin-label">Date</label>
+                            <input class="admin-input" id="cl-date" placeholder="Oct 21, 2026" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="admin-field">
+                        <label class="admin-label">Title (optional)</label>
+                        <input class="admin-input" id="cl-title" placeholder="Stability pass" autocomplete="off">
+                    </div>
+                    <div class="admin-field">
+                        <label class="admin-label">Changes</label>
+                        <div id="cl-items"></div>
+                        <button type="button" class="admin-btn ghost sm" id="cl-add-item" style="margin-top:4px;">+ Add change</button>
+                    </div>
+                    <div style="margin-top:14px;">
+                        <button type="button" class="admin-btn" id="cl-save">Publish patch note</button>
+                    </div>
+                </div>
+
+                <div class="admin-card">
+                    <div class="admin-card-head">
+                        <div>
+                            <div class="admin-card-title">Existing patch notes</div>
+                            <div class="admin-card-sub" id="cl-count">—</div>
+                        </div>
+                        <select class="admin-select" id="cl-filter" style="width:auto; min-width:160px;"></select>
+                    </div>
+                    <div id="cl-list">
+                        <div class="admin-empty">Loading…</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- STAFF -->
+            <section class="admin-panel" id="panel-staff">
+                <div class="admin-note">
+                    <strong>Roles:</strong> Customer (default) · Staff (status + changelog) · Co-Owner (staff + role management) · Owner (full access). Only an Owner can assign the Owner role.
+                </div>
+                <div class="admin-card">
+                    <div class="admin-card-head">
+                        <div>
+                            <div class="admin-card-title">Users</div>
+                            <div class="admin-card-sub" id="staff-count">Change a user's role. Takes effect on their next page load.</div>
+                        </div>
+                    </div>
+                    <div class="staff-toolbar">
+                        <input class="admin-input" id="staff-search" placeholder="Search by username or ID…" autocomplete="off">
+                        <select class="admin-select" id="staff-role-filter">
+                            <option value="all">All roles</option>
+                            <option value="customer">Customer</option>
+                            <option value="staff">Staff</option>
+                            <option value="co_owner">Co-Owner</option>
+                            <option value="owner">Owner</option>
+                        </select>
+                    </div>
+                    <div id="staff-list">
+                        <div class="admin-empty">Loading users…</div>
+                    </div>
+                </div>
+            </section>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="admin-toast" id="admin-toast"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="/config.js?v=11"></script>
+    <script src="/supabase-client.js?v=11"></script>
+    <script src="/auth-roles.js?v=11"></script>
+    <script src="/main.js?v=11"></script>
+    <script defer src="/logo-data.js?v=11"></script>
+    <script>
+    (function () {
+        var sb = window.supabaseClient;
+        var R = window.VadeRoles;
+        var me = null;
+        var products = [];
+
+        function toast(msg, isError) {
+            var el = document.getElementById('admin-toast');
+            el.textContent = msg;
+            el.classList.toggle('error', !!isError);
+            el.classList.add('show');
+            clearTimeout(el._t);
+            el._t = setTimeout(function () { el.classList.remove('show'); }, 2600);
+        }
+
+        function esc(s) {
+            return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+                return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+            });
+        }
+
+        // ── Audit trail ──
+        async function audit(action, target, detail) {
+            try {
+                await sb.from('audit_log').insert({
+                    actor: me ? (me.username || 'Unknown') : null,
+                    actor_id: me ? me.id : null,
+                    action: action,
+                    target: target || null,
+                    detail: detail || null
+                });
+            } catch (e) {}
+            if (document.getElementById('panel-audit') &&
+                document.getElementById('panel-audit').classList.contains('active')) loadAudit();
+        }
+
+        // ── Discord webhook alerts ──
+        async function alertDiscord(title, desc, color) {
+            var url = window.DISCORD_WEBHOOK_URL;
+            if (!url) return false;
+            try {
+                var res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        embeds: [{
+                            title: title,
+                            description: desc,
+                            color: color || 0x8b5cf6,
+                            footer: { text: 'Vade Control' },
+                            timestamp: new Date().toISOString()
+                        }]
+                    })
+                });
+                return res.ok;
+            } catch (e) { return false; }
+        }
+
+        var STATUS_COLORS = { online: 0x10b981, offline: 0xef4444, updating: 0xf59e0b };
+
+        function todayLabel() {
+            var d = new Date();
+            var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            return months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+        }
+
+        // ── Navigation ──
+        var TAB_META = {
+            overview:  { t: 'Overview', s: 'Everything happening across Vade, at a glance.' },
+            lookup:    { t: 'User Lookup', s: 'Pull up any registered account by username, Discord ID, or UUID.' },
+            products:  { t: 'Products', s: 'Live status and public descriptions shown on the status page.' },
+            prices:    { t: 'Prices', s: 'Plan prices and buy links shown on each product page.' },
+            scheduler: { t: 'Maintenance', s: 'Schedule downtime windows — auto-reverts when the window ends.' },
+            changelog: { t: 'Changelog', s: 'Patch notes shown when users open a product changelog.' },
+            orders:    { t: 'Orders & Sales', s: 'Track revenue and manually log purchases.' },
+            coupons:   { t: 'Coupons', s: 'Create and manage discount codes.' },
+            licenses:  { t: 'License Keys', s: 'Create, check, and revoke KeyAuth licenses.' },
+            reviews:   { t: 'Reviews', s: 'Moderate community star reviews shown on the homepage and rate page.' },
+            audit:     { t: 'Audit Log', s: 'Every admin action, newest first.' },
+            staff:     { t: 'Users & Roles', s: 'Manage staff access and role assignments.' }
+        };
+
+        function activateTab(name, skipHash) {
+            if (!TAB_META[name]) name = 'overview';
+            if (name === 'staff' && !(me && R.atLeast(me.role, 'co_owner'))) name = 'overview';
+
+            document.querySelectorAll('.admin-nav-btn').forEach(function (b) {
+                b.classList.toggle('active', b.getAttribute('data-tab') === name);
+            });
+            document.querySelectorAll('.admin-panel').forEach(function (p) {
+                p.classList.toggle('active', p.id === 'panel-' + name);
+            });
+            document.getElementById('admin-title').textContent = TAB_META[name].t;
+            document.getElementById('admin-sub').textContent = TAB_META[name].s;
+
+            if (!skipHash && location.hash.slice(1) !== name) location.hash = name;
+            if (name === 'staff') loadStaff();
+            if (name === 'changelog') renderChangelogs();
+            if (name === 'overview') renderOverview();
+            if (name === 'lookup') { var li = document.getElementById('lookup-input'); if (li) li.focus(); }
+            if (name === 'prices') renderPrices();
+            if (name === 'scheduler') renderScheduler();
+            if (name === 'orders') loadOrders();
+            if (name === 'coupons') loadCoupons();
+            if (name === 'licenses') loadLicenses();
+            if (name === 'reviews') loadReviews();
+            if (name === 'audit') loadAudit();
+        }
+
+        document.querySelectorAll('.admin-nav-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () { activateTab(btn.getAttribute('data-tab')); });
+        });
+
+        window.addEventListener('hashchange', function () {
+            activateTab(location.hash.slice(1), true);
+        });
+
+        // ── Products ──
+        var noV2 = false;
+
+        async function loadProducts() {
+            var { data, error } = await sb
+                .from('products')
+                .select('id, slug, name, game, status, description, sort_order, prices, maintenance_until')
+                .order('sort_order', { ascending: true });
+            if (error && !noV2) {
+                // admin-setup-v2.sql not run yet — fall back to the v1 columns
+                var retry = await sb
+                    .from('products')
+                    .select('id, slug, name, game, status, description, sort_order')
+                    .order('sort_order', { ascending: true });
+                if (!retry.error) {
+                    noV2 = true;
+                    error = null;
+                    data = retry.data;
+                }
+            }
+            if (error) {
+                document.getElementById('products-list').innerHTML =
+                    '<div class="admin-empty">Could not load products. Run admin-setup.sql in Supabase first.</div>';
+                return;
+            }
+            products = data || [];
+            renderProducts();
+            fillProductSelects();
+        }
+
+        function renderProducts() {
+            var wrap = document.getElementById('products-list');
+            if (!products.length) {
+                wrap.innerHTML = '<div class="admin-empty">No products found.</div>';
+                return;
+            }
+            wrap.innerHTML = products.map(function (p) {
+                function chip(s, label) {
+                    return '<button type="button" class="status-chip chip-' + s + (p.status === s ? ' active' : '') + '" data-status="' + s + '"><span class="chip-dot"></span>' + label + '</button>';
+                }
+                return '<div class="admin-card" data-slug="' + esc(p.slug) + '">' +
+                    '<div class="admin-card-head">' +
+                        '<div>' +
+                            '<div class="admin-card-title">' + esc(p.name) + '</div>' +
+                            '<div class="admin-card-sub">' + esc(p.game) + ' · ' + esc(p.slug) + '</div>' +
+                        '</div>' +
+                        '<span class="admin-status-pill ' + esc(p.status) + '">' + esc(p.status) + '</span>' +
+                    '</div>' +
+                    '<div class="admin-field">' +
+                        '<label class="admin-label">Status — click to apply instantly</label>' +
+                        '<div class="status-chips">' +
+                            chip('online', 'Online') + chip('updating', 'Updating') + chip('offline', 'Offline') +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="admin-field" style="margin-top:12px;">' +
+                        '<label class="admin-label">Public description</label>' +
+                        '<input class="admin-input prod-desc" value="' + esc(p.description) + '">' +
+                    '</div>' +
+                    '<div style="margin-top:12px;">' +
+                        '<button type="button" class="admin-btn sm prod-save">Save description</button>' +
+                    '</div>' +
+                '</div>';
+            }).join('');
+
+            wrap.querySelectorAll('.admin-card').forEach(function (card) {
+                var slug = card.getAttribute('data-slug');
+
+                function applyStatus(newStatus) {
+                    return sb.from('products')
+                        .update({ status: newStatus, updated_at: new Date().toISOString() })
+                        .eq('slug', slug);
+                }
+
+                card.querySelectorAll('.status-chip').forEach(function (chipBtn) {
+                    chipBtn.addEventListener('click', async function () {
+                        var newStatus = chipBtn.getAttribute('data-status');
+                        var p = products.find(function (x) { return x.slug === slug; });
+                        if (p && p.status === newStatus) return;
+                        card.querySelectorAll('.status-chip').forEach(function (b) { b.disabled = true; });
+                        var { error } = await applyStatus(newStatus);
+                        card.querySelectorAll('.status-chip').forEach(function (b) { b.disabled = false; });
+                        if (error) { toast('Update failed: ' + error.message, true); return; }
+                        if (p) p.status = newStatus;
+                        card.querySelectorAll('.status-chip').forEach(function (b) {
+                            b.classList.toggle('active', b.getAttribute('data-status') === newStatus);
+                        });
+                        var pill = card.querySelector('.admin-status-pill');
+                        pill.className = 'admin-status-pill ' + newStatus;
+                        pill.textContent = newStatus;
+                        toast(slug + ' → ' + newStatus);
+                        audit('status', slug, 'status → ' + newStatus);
+                        alertDiscord('Status changed', '**' + slug + '** → `' + newStatus + '`', STATUS_COLORS[newStatus] || 0x8b5cf6);
+                        renderOverview();
+                    });
+                });
+
+                card.querySelector('.prod-save').addEventListener('click', async function () {
+                    var desc = card.querySelector('.prod-desc').value.trim();
+                    var status = card.querySelector('.status-chip.active').getAttribute('data-status');
+                    var btn = card.querySelector('.prod-save');
+                    btn.disabled = true;
+                    var res = await sb.from('products')
+                        .update({ status: status, description: desc, updated_at: new Date().toISOString() })
+                        .eq('slug', slug);
+                    btn.disabled = false;
+                    if (res.error) { toast('Save failed: ' + res.error.message, true); return; }
+                    var p = products.find(function (x) { return x.slug === slug; });
+                    if (p) p.description = desc;
+                    toast('Saved ' + slug);
+                    audit('description', slug, 'public description saved');
+                });
+            });
+        }
+
+        function fillProductSelects() {
+            var opts = products.map(function (p) {
+                return '<option value="' + esc(p.slug) + '">' + esc(p.name) + '</option>';
+            }).join('');
+            document.getElementById('cl-product').innerHTML = opts;
+            document.getElementById('cl-filter').innerHTML = '<option value="all">All products</option>' + opts;
+            ['sched-product', 'ord-product', 'lic-product'].forEach(function (id) {
+                var el = document.getElementById(id);
+                if (el) el.innerHTML = opts;
+            });
+            var cpl = document.getElementById('cpl-product');
+            if (cpl) cpl.innerHTML = '<option value="">All products</option>' + opts;
+        }
+
+        // ── Changelog ──
+        function addItemRow(type, text) {
+            var row = document.createElement('div');
+            row.className = 'cl-item-row';
+            row.innerHTML =
+                '<select class="admin-select cl-item-type">' +
+                    '<option value="added"' + (type === 'added' ? ' selected' : '') + '>Added</option>' +
+                    '<option value="fixed"' + (type === 'fixed' ? ' selected' : '') + '>Fixed</option>' +
+                    '<option value="changed"' + (type === 'changed' ? ' selected' : '') + '>Changed</option>' +
+                    '<option value="removed"' + (type === 'removed' ? ' selected' : '') + '>Removed</option>' +
+                '</select>' +
+                '<input class="admin-input cl-item-text" placeholder="What changed…" value="' + esc(text || '') + '">' +
+                '<button type="button" class="cl-item-remove" aria-label="Remove">' +
+                    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+                '</button>';
+            row.querySelector('.cl-item-remove').addEventListener('click', function () { row.remove(); });
+            document.getElementById('cl-items').appendChild(row);
+        }
+
+        document.getElementById('cl-add-item').addEventListener('click', function () { addItemRow('fixed', ''); });
+
+        document.getElementById('cl-save').addEventListener('click', async function () {
+            var slug = document.getElementById('cl-product').value;
+            var version = document.getElementById('cl-version').value.trim();
+            var date = document.getElementById('cl-date').value.trim();
+            var title = document.getElementById('cl-title').value.trim();
+            var items = [];
+            document.querySelectorAll('#cl-items .cl-item-row').forEach(function (row) {
+                var text = row.querySelector('.cl-item-text').value.trim();
+                if (text) items.push({ type: row.querySelector('.cl-item-type').value, text: text });
+            });
+            if (!slug || !version || !date) { toast('Version and date are required', true); return; }
+            if (!items.length) { toast('Add at least one change', true); return; }
+
+            var btn = document.getElementById('cl-save');
+            btn.disabled = true;
+            var { error } = await sb.from('product_changelog').insert({
+                product_slug: slug,
+                version: version,
+                title: title,
+                entry_date: date,
+                items: items
+            });
+            btn.disabled = false;
+            if (error) { toast('Publish failed: ' + error.message, true); return; }
+            toast('Published ' + version);
+            audit('changelog', slug, 'published ' + version);
+            alertDiscord('Patch note published', '**' + slug + '** ' + version + (title ? ' — ' + title : ''), 0x8b5cf6);
+            document.getElementById('cl-version').value = '';
+            document.getElementById('cl-title').value = '';
+            document.getElementById('cl-date').value = todayLabel();
+            document.getElementById('cl-items').innerHTML = '';
+            addItemRow('fixed', '');
+            loadChangelogs();
+        });
+
+        var allEntries = [];
+
+        async function loadChangelogs() {
+            var { data, error } = await sb
+                .from('product_changelog')
+                .select('id, product_slug, version, title, entry_date, items, created_at')
+                .order('created_at', { ascending: false });
+            if (error) {
+                document.getElementById('cl-list').innerHTML = '<div class="admin-empty">Could not load changelog.</div>';
+                return;
+            }
+            allEntries = data || [];
+            renderChangelogs();
+        }
+
+        function renderChangelogs() {
+            var filter = document.getElementById('cl-filter').value || 'all';
+            var entries = allEntries.filter(function (e) {
+                return filter === 'all' || e.product_slug === filter;
+            });
+            document.getElementById('cl-count').textContent = entries.length + ' entries';
+            var wrap = document.getElementById('cl-list');
+            if (!entries.length) {
+                wrap.innerHTML = '<div class="admin-empty">No patch notes yet.</div>';
+                return;
+            }
+            wrap.innerHTML = entries.map(function (e) {
+                var prod = products.find(function (p) { return p.slug === e.product_slug; });
+                var pname = prod ? prod.name : e.product_slug;
+                var items = (e.items || []).map(function (it) {
+                    return '<li><span class="cl-tag ' + esc(it.type) + '">' + esc(it.type) + '</span><span>' + esc(it.text) + '</span></li>';
+                }).join('');
+                return '<div class="cl-entry" data-id="' + esc(e.id) + '">' +
+                    '<div class="cl-entry-top">' +
+                        '<span class="cl-entry-ver">' + esc(e.version) + ' · ' + esc(pname) + '</span>' +
+                        '<span class="cl-entry-meta">' + esc(e.entry_date) + '</span>' +
+                    '</div>' +
+                    (e.title ? '<div class="cl-entry-title">' + esc(e.title) + '</div>' : '') +
+                    '<ul class="cl-entry-items">' + items + '</ul>' +
+                    '<button type="button" class="admin-btn danger sm cl-delete">Delete</button>' +
+                '</div>';
+            }).join('');
+
+            wrap.querySelectorAll('.cl-delete').forEach(function (btn) {
+                btn.addEventListener('click', async function () {
+                    var id = btn.closest('.cl-entry').getAttribute('data-id');
+                    btn.disabled = true;
+                    var { error } = await sb.from('product_changelog').delete().eq('id', id);
+                    if (error) { toast('Delete failed: ' + error.message, true); btn.disabled = false; return; }
+                    toast('Entry deleted');
+                    audit('changelog', id, 'patch note deleted');
+                    loadChangelogs();
+                });
+            });
+        }
+
+        document.getElementById('cl-filter').addEventListener('change', renderChangelogs);
+
+        // ── Users cache ──
+        var usersCache = [];
+
+        async function fetchUsers() {
+            var { data, error } = await sb
+                .from('profiles')
+                .select('id, username, discord_id, role')
+                .order('role', { ascending: false });
+            usersCache = error ? [] : (data || []);
+            return usersCache;
+        }
+
+        // ── Overview ──
+        function renderOverview() {
+            var online = 0, offline = 0, updating = 0;
+            products.forEach(function (p) {
+                if (p.status === 'offline') offline++;
+                else if (p.status === 'updating') updating++;
+                else online++;
+            });
+            document.getElementById('st-online').textContent = online;
+            document.getElementById('st-online-sub').textContent = 'of ' + products.length + ' products';
+            document.getElementById('st-offline').textContent = offline;
+            document.getElementById('st-offline-sub').textContent = updating + ' updating';
+            document.getElementById('st-users').textContent = usersCache.length || '—';
+            var staffN = usersCache.filter(function (u) { return u.role && u.role !== 'customer'; }).length;
+            document.getElementById('st-users-sub').textContent = staffN + (staffN === 1 ? ' staff member' : ' staff members');
+            document.getElementById('st-notes').textContent = allEntries.length;
+
+            var bp = document.getElementById('nav-badge-products');
+            if (bp) bp.textContent = products.length;
+            var bc = document.getElementById('nav-badge-cl');
+            if (bc) bc.textContent = allEntries.length;
+
+            var ovp = document.getElementById('ov-products');
+            if (!products.length) {
+                ovp.innerHTML = '<div class="admin-empty">No products found.</div>';
+            } else {
+                ovp.innerHTML = products.map(function (p) {
+                    return '<div class="mini-row">' +
+                        '<div class="mini-info">' +
+                            '<span class="mini-name">' + esc(p.name) + '</span>' +
+                            '<span class="mini-game">' + esc(p.game) + '</span>' +
+                        '</div>' +
+                        '<div class="mini-right">' +
+                            '<span class="admin-status-pill ' + esc(p.status) + '">' + esc(p.status) + '</span>' +
+                            '<button type="button" class="admin-btn ghost sm ov-manage">Manage</button>' +
+                        '</div>' +
+                    '</div>';
+                }).join('');
+                ovp.querySelectorAll('.ov-manage').forEach(function (b) {
+                    b.addEventListener('click', function () { activateTab('products'); });
+                });
+            }
+
+            var ovn = document.getElementById('ov-notes');
+            var latest = allEntries.slice(0, 3);
+            if (!latest.length) {
+                ovn.innerHTML = '<div class="admin-empty">No patch notes yet.</div>';
+            } else {
+                ovn.innerHTML = latest.map(function (e) {
+                    var prod = products.find(function (p) { return p.slug === e.product_slug; });
+                    var pname = prod ? prod.name : e.product_slug;
+                    return '<div class="mini-row">' +
+                        '<div class="mini-info">' +
+                            '<span class="mini-name">' + esc(e.version) + ' · ' + esc(pname) + '</span>' +
+                            '<span class="mini-game">' + esc(e.title || ((e.items || []).length + ' changes')) + '</span>' +
+                        '</div>' +
+                        '<div class="mini-right"><span class="mini-game">' + esc(e.entry_date) + '</span></div>' +
+                    '</div>';
+                }).join('');
+            }
+        }
+
+        // ── Staff ──
+        async function loadStaff() {
+            await fetchUsers();
+            renderStaff();
+        }
+
+        function renderStaff() {
+            var q = (document.getElementById('staff-search').value || '').trim().toLowerCase();
+            var rf = document.getElementById('staff-role-filter').value || 'all';
+            var data = usersCache.filter(function (u) {
+                var role = u.role || 'customer';
+                if (rf !== 'all' && role !== rf) return false;
+                if (q) {
+                    var hay = ((u.username || '') + ' ' + u.id).toLowerCase();
+                    if (hay.indexOf(q) === -1) return false;
+                }
+                return true;
+            });
+
+            document.getElementById('staff-count').textContent =
+                data.length + ' of ' + usersCache.length + ' users shown · role changes apply on their next page load';
+
+            var wrap = document.getElementById('staff-list');
+            if (!usersCache.length) {
+                wrap.innerHTML = '<div class="admin-empty">No users found.</div>';
+                return;
+            }
+            if (!data.length) {
+                wrap.innerHTML = '<div class="admin-empty">No users match your search.</div>';
+                return;
+            }
+            wrap.innerHTML = data.map(function (u) {
+                var role = u.role || 'customer';
+                var isMe = me && u.id === me.id;
+                var roleOptions = ['customer', 'staff', 'co_owner', 'owner'].map(function (r) {
+                    var label = R.LABELS[r];
+                    return '<option value="' + r + '"' + (role === r ? ' selected' : '') + '>' + label + '</option>';
+                }).join('');
+                var canEdit = R.atLeast(me.role, 'co_owner');
+                if (role === 'owner' && me.role !== 'owner') canEdit = false;
+                if (isMe && role === 'owner') canEdit = false;
+                return '<div class="staff-row" data-id="' + esc(u.id) + '">' +
+                    '<div class="staff-info">' +
+                        '<span class="staff-name">' + esc(u.username || 'Unknown') + (isMe ? ' (you)' : '') + '</span>' +
+                        '<span class="staff-id">' + esc(u.id) + '</span>' +
+                    '</div>' +
+                    '<div class="staff-actions">' +
+                        '<span class="user-role-badge role-' + esc(role) + '">' + esc(R.LABELS[role] || role) + '</span>' +
+                        (canEdit
+                            ? '<select class="admin-select staff-role-select">' + roleOptions + '</select>' +
+                              '<button type="button" class="admin-btn sm staff-save">Save</button>'
+                            : '') +
+                    '</div>' +
+                '</div>';
+            }).join('');
+
+            wrap.querySelectorAll('.staff-save').forEach(function (btn) {
+                btn.addEventListener('click', async function () {
+                    var row = btn.closest('.staff-row');
+                    var id = row.getAttribute('data-id');
+                    var role = row.querySelector('.staff-role-select').value;
+                    if (role === 'owner' && me.role !== 'owner') { toast('Only an Owner can assign Owner', true); return; }
+                    btn.disabled = true;
+                    var { error } = await sb.from('profiles').update({ role: role }).eq('id', id);
+                    btn.disabled = false;
+                    if (error) { toast('Update failed: ' + error.message, true); return; }
+                    var targetUser = usersCache.find(function (u) { return u.id === id; });
+                    toast('Role updated');
+                    audit('role', targetUser ? (targetUser.username || id) : id, 'role → ' + (R.LABELS[role] || role));
+                    loadStaff();
+                    renderOverview();
+                });
+            });
+        }
+
+        document.getElementById('staff-search').addEventListener('input', renderStaff);
+        document.getElementById('staff-role-filter').addEventListener('change', renderStaff);
+
+        // ── Helpers ──
+        function fmtDT(iso) {
+            if (!iso) return '—';
+            var d = new Date(iso);
+            if (isNaN(d)) return iso;
+            var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            var h = d.getHours(), ap = h >= 12 ? 'PM' : 'AM';
+            h = h % 12 || 12;
+            var m = String(d.getMinutes()).padStart(2, '0');
+            return months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear() + ', ' + h + ':' + m + ' ' + ap;
+        }
+
+        function fmtRel(iso) {
+            var ms = new Date(iso) - Date.now();
+            if (ms <= 0) return 'due now';
+            var mins = Math.round(ms / 60000);
+            if (mins < 60) return 'in ' + mins + 'm';
+            var hrs = Math.floor(mins / 60);
+            if (hrs < 48) return 'in ' + hrs + 'h ' + (mins % 60) + 'm';
+            return 'in ' + Math.round(hrs / 24) + 'd';
+        }
+
+        function money(n) { return '$' + Number(n || 0).toFixed(2); }
+
+        // ── Prices ──
+        function priceRowHTML(p) {
+            return '<div class="price-plan-row">' +
+                '<input class="admin-input price-name" placeholder="7 Days" value="' + esc(p.name) + '">' +
+                '<input class="admin-input price-desc" placeholder="Weekly access" value="' + esc(p.desc || '') + '">' +
+                '<input class="admin-input price-val" type="number" min="0" step="0.01" placeholder="25" value="' + esc(p.price) + '">' +
+                '<input class="admin-input price-link" placeholder="Checkout link" value="' + esc(p.link || '') + '">' +
+                '<button type="button" class="price-remove" aria-label="Remove plan">' +
+                    '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+                '</button>' +
+            '</div>';
+        }
+
+        function bindPriceRow(row) {
+            row.querySelector('.price-remove').addEventListener('click', function () { row.remove(); });
+        }
+
+        function renderPrices() {
+            var wrap = document.getElementById('prices-list');
+            if (noV2) { wrap.innerHTML = '<div class="admin-empty">Prices live in the <code class="mono">prices</code> column — run admin-setup-v2.sql in Supabase first.</div>'; return; }
+            if (!products.length) { wrap.innerHTML = '<div class="admin-empty">No products loaded.</div>'; return; }
+            wrap.innerHTML = products.map(function (p) {
+                var plans = p.prices || [];
+                return '<div class="admin-card" data-slug="' + esc(p.slug) + '">' +
+                    '<div class="admin-card-head">' +
+                        '<div>' +
+                            '<div class="admin-card-title">' + esc(p.name) + '</div>' +
+                            '<div class="admin-card-sub">' + plans.length + ' plan' + (plans.length === 1 ? '' : 's') + ' · ' + esc(p.slug) + '</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="price-rows">' + plans.map(priceRowHTML).join('') + '</div>' +
+                    '<div class="price-actions">' +
+                        '<button type="button" class="admin-btn ghost sm price-add">+ Add plan</button>' +
+                        '<button type="button" class="admin-btn sm price-save">Save prices</button>' +
+                    '</div>' +
+                '</div>';
+            }).join('');
+
+            wrap.querySelectorAll('.admin-card').forEach(function (card) {
+                card.querySelectorAll('.price-plan-row').forEach(bindPriceRow);
+                card.querySelector('.price-add').addEventListener('click', function () {
+                    var div = document.createElement('div');
+                    div.innerHTML = priceRowHTML({ name: '', desc: '', price: '', link: '' });
+                    var row = div.firstChild;
+                    card.querySelector('.price-rows').appendChild(row);
+                    bindPriceRow(row);
+                    row.querySelector('.price-name').focus();
+                });
+                card.querySelector('.price-save').addEventListener('click', async function () {
+                    var slug = card.getAttribute('data-slug');
+                    var plans = [];
+                    card.querySelectorAll('.price-plan-row').forEach(function (row) {
+                        var name = row.querySelector('.price-name').value.trim();
+                        var price = parseFloat(row.querySelector('.price-val').value);
+                        if (!name || isNaN(price) || price < 0) return;
+                        plans.push({
+                            name: name,
+                            desc: row.querySelector('.price-desc').value.trim(),
+                            price: price,
+                            link: row.querySelector('.price-link').value.trim()
+                        });
+                    });
+                    if (!plans.length) { toast('Add at least one valid plan', true); return; }
+                    var btn = card.querySelector('.price-save');
+                    btn.disabled = true;
+                    var { error } = await sb.from('products').update({ prices: plans, updated_at: new Date().toISOString() }).eq('slug', slug);
+                    btn.disabled = false;
+                    if (error) { toast('Save failed: ' + error.message, true); return; }
+                    var p = products.find(function (x) { return x.slug === slug; });
+                    if (p) p.prices = plans;
+                    toast('Prices saved for ' + slug);
+                    audit('price', slug, plans.map(function (q) { return q.name + ' ' + money(q.price); }).join(', '));
+                });
+            });
+        }
+
+        // ── Maintenance scheduler ──
+        function renderScheduler() {
+            var wrap0 = document.getElementById('sched-list');
+            if (noV2) {
+                document.getElementById('sched-count').textContent = 'needs schema v2';
+                wrap0.innerHTML = '<div class="admin-empty">Maintenance windows live in the <code class="mono">maintenance_until</code> column — run admin-setup-v2.sql in Supabase first.</div>';
+                return;
+            }
+            var list = products.filter(function (p) { return p.maintenance_until; });
+            document.getElementById('sched-count').textContent =
+                list.length ? list.length + ' window' + (list.length === 1 ? '' : 's') + ' on record' : 'none on record';
+            var wrap = document.getElementById('sched-list');
+            if (!list.length) { wrap.innerHTML = '<div class="admin-empty">No maintenance windows.</div>'; return; }
+            wrap.innerHTML = list.map(function (p) {
+                var expired = new Date(p.maintenance_until) <= Date.now();
+                return '<div class="data-row" data-slug="' + esc(p.slug) + '">' +
+                    '<div class="data-left">' +
+                        '<span class="data-title">' + esc(p.name) + '</span>' +
+                        '<span class="data-sub">' + (expired ? 'revert due — flips to online on next check' : 'ends ' + fmtRel(p.maintenance_until)) + '</span>' +
+                    '</div>' +
+                    '<div class="data-right">' +
+                        '<span class="tag ' + (expired ? 'warn' : 'pending') + '">' + (expired ? 'due' : 'active') + '</span>' +
+                        '<span class="data-sub mono">' + fmtDT(p.maintenance_until) + '</span>' +
+                        '<button type="button" class="admin-btn sm sched-end">End now</button>' +
+                    '</div>' +
+                '</div>';
+            }).join('');
+            wrap.querySelectorAll('.sched-end').forEach(function (btn) {
+                btn.addEventListener('click', async function () {
+                    var slug = btn.closest('.data-row').getAttribute('data-slug');
+                    btn.disabled = true;
+                    var { error } = await sb.from('products')
+                        .update({ status: 'online', maintenance_until: null, updated_at: new Date().toISOString() })
+                        .eq('slug', slug);
+                    btn.disabled = false;
+                    if (error) { toast('Failed: ' + error.message, true); return; }
+                    var p = products.find(function (x) { return x.slug === slug; });
+                    if (p) { p.status = 'online'; p.maintenance_until = null; }
+                    toast('Maintenance ended — ' + slug + ' online');
+                    audit('maintenance', slug, 'window ended early → online');
+                    alertDiscord('Maintenance ended', slug + ' is back **online**.', 0x10b981);
+                    renderScheduler();
+                    renderOverview();
+                });
+            });
+        }
+
+        document.getElementById('sched-start').addEventListener('click', async function () {
+            var slug = document.getElementById('sched-product').value;
+            var until = document.getElementById('sched-until').value;
+            var note = document.getElementById('sched-note').value.trim();
+            if (!slug || !until) { toast('Pick a product and revert time', true); return; }
+            var iso = new Date(until).toISOString();
+            if (new Date(iso) <= Date.now()) { toast('Revert time must be in the future', true); return; }
+            var btn = document.getElementById('sched-start');
+            btn.disabled = true;
+            var { error } = await sb.from('products')
+                .update({ status: 'offline', maintenance_until: iso, updated_at: new Date().toISOString() })
+                .eq('slug', slug);
+            btn.disabled = false;
+            if (error) { toast('Failed: ' + error.message, true); return; }
+            var p = products.find(function (x) { return x.slug === slug; });
+            if (p) { p.status = 'offline'; p.maintenance_until = iso; }
+            toast('Maintenance started — reverts ' + fmtDT(iso));
+            audit('maintenance', slug, 'offline until ' + fmtDT(iso) + (note ? ' — ' + note : ''));
+            alertDiscord('Maintenance started', '**' + slug + '** is offline until <t:' + Math.floor(new Date(iso) / 1000) + ':F>' + (note ? '\n' + note : ''), 0xf59e0b);
+            document.getElementById('sched-note').value = '';
+            renderScheduler();
+            renderOverview();
+        });
+
+        document.getElementById('sched-revert').addEventListener('click', async function () {
+            var btn = document.getElementById('sched-revert');
+            btn.disabled = true;
+            var { error } = await sb.rpc('revert_expired_maintenance');
+            btn.disabled = false;
+            if (error) { toast('Revert failed: ' + error.message, true); return; }
+            await loadProducts();
+            renderScheduler();
+            renderOverview();
+            toast('Auto-revert run — windows past their time are online');
+        });
+
+        // ── Orders & sales ──
+        var ordersCache = [];
+
+        async function loadOrders() {
+            var { data, error } = await sb
+                .from('orders')
+                .select('id, product_slug, plan_name, amount, customer, discord_id, status, note, created_at')
+                .order('created_at', { ascending: false })
+                .limit(100);
+            ordersCache = error ? [] : (data || []);
+            renderOrders(error);
+        }
+
+        function renderOrders(loadError) {
+            var wrap = document.getElementById('ord-list');
+            if (loadError) { wrap.innerHTML = '<div class="admin-empty">Could not load orders — run admin-setup-v2.sql.</div>'; return; }
+            var paid = ordersCache.filter(function (o) { return o.status === 'paid'; });
+            var refunded = ordersCache.filter(function (o) { return o.status === 'refunded'; });
+            var rev = paid.reduce(function (s, o) { return s + Number(o.amount || 0); }, 0);
+            var cutoff = Date.now() - 30 * 864e5;
+            var rev30 = paid.reduce(function (s, o) { return new Date(o.created_at) >= cutoff ? s + Number(o.amount || 0) : s; }, 0);
+            var refSum = refunded.reduce(function (s, o) { return s + Number(o.amount || 0); }, 0);
+            document.getElementById('ord-rev').textContent = money(rev);
+            document.getElementById('ord-rev30').textContent = money(rev30);
+            document.getElementById('ord-paid').textContent = paid.length;
+            document.getElementById('ord-ref').textContent = refunded.length;
+            document.getElementById('ord-ref-sub').textContent = money(refSum) + ' returned';
+            document.getElementById('ord-list-count').textContent = ordersCache.length + ' order' + (ordersCache.length === 1 ? '' : 's') + ' shown';
+
+            if (!ordersCache.length) { wrap.innerHTML = '<div class="admin-empty">No orders yet.</div>'; return; }
+            wrap.innerHTML = ordersCache.map(function (o) {
+                var prod = products.find(function (p) { return p.slug === o.product_slug; });
+                var tagCls = o.status === 'paid' ? 'paid' : (o.status === 'refunded' ? 'refunded' : 'pending');
+                return '<div class="data-row" data-id="' + esc(o.id) + '">' +
+                    '<div class="data-left">' +
+                        '<span class="data-title">' + esc(o.customer || 'Unknown') + ' · ' + esc(prod ? prod.name : (o.product_slug || '—')) + (o.plan_name ? ' — ' + esc(o.plan_name) : '') + '</span>' +
+                        '<span class="data-sub">' + fmtDT(o.created_at) + (o.discord_id ? ' · discord ' + esc(o.discord_id) : '') + '</span>' +
+                    '</div>' +
+                    '<div class="data-right">' +
+                        '<span class="tag ' + tagCls + '">' + esc(o.status) + '</span>' +
+                        '<span class="data-amount">' + money(o.amount) + '</span>' +
+                        '<button type="button" class="admin-btn danger sm ord-del">Delete</button>' +
+                    '</div>' +
+                '</div>';
+            }).join('');
+
+            wrap.querySelectorAll('.ord-del').forEach(function (btn) {
+                btn.addEventListener('click', async function () {
+                    var id = btn.closest('.data-row').getAttribute('data-id');
+                    var o = ordersCache.find(function (x) { return x.id === id; });
+                    btn.disabled = true;
+                    var { error } = await sb.from('orders').delete().eq('id', id);
+                    if (error) { toast('Delete failed: ' + error.message, true); btn.disabled = false; return; }
+                    audit('order', o ? (o.product_slug || 'order') : id, 'order deleted — ' + money(o ? o.amount : 0));
+                    loadOrders();
+                });
+            });
+        }
+
+        document.getElementById('ord-add').addEventListener('click', async function () {
+            var amount = parseFloat(document.getElementById('ord-amount').value);
+            var customer = document.getElementById('ord-customer').value.trim();
+            if (isNaN(amount) || amount <= 0) { toast('Enter a valid amount', true); return; }
+            if (!customer) { toast('Customer name required', true); return; }
+            var slug = document.getElementById('ord-product').value;
+            var plan = document.getElementById('ord-plan').value.trim();
+            var discord = document.getElementById('ord-discord').value.trim();
+            var status = document.getElementById('ord-status').value;
+            var btn = document.getElementById('ord-add');
+            btn.disabled = true;
+            var { error } = await sb.from('orders').insert({
+                product_slug: slug, plan_name: plan, amount: amount,
+                customer: customer, discord_id: discord || null, status: status
+            });
+            btn.disabled = false;
+            if (error) { toast('Insert failed: ' + error.message, true); return; }
+            toast('Order logged — ' + money(amount));
+            audit('order', slug, customer + ' · ' + (plan || 'plan') + ' · ' + money(amount) + ' (' + status + ')');
+            document.getElementById('ord-plan').value = '';
+            document.getElementById('ord-amount').value = '';
+            document.getElementById('ord-customer').value = '';
+            document.getElementById('ord-discord').value = '';
+            loadOrders();
+        });
+
+        // ── Coupons ──
+        var couponsCache = [];
+
+        async function loadCoupons() {
+            var { data, error } = await sb
+                .from('coupons')
+                .select('id, code, discount_type, discount_value, product_slug, max_uses, used_count, expires_at, active, created_at')
+                .order('created_at', { ascending: false });
+            couponsCache = error ? [] : (data || []);
+            renderCoupons(error);
+        }
+
+        function renderCoupons(loadError) {
+            var wrap = document.getElementById('cpl-list');
+            if (loadError) { wrap.innerHTML = '<div class="admin-empty">Could not load coupons — run admin-setup-v2.sql.</div>'; return; }
+            document.getElementById('cpl-count').textContent = couponsCache.length + ' code' + (couponsCache.length === 1 ? '' : 's');
+            if (!couponsCache.length) { wrap.innerHTML = '<div class="admin-empty">No coupons yet.</div>'; return; }
+            wrap.innerHTML = couponsCache.map(function (c) {
+                var prod = c.product_slug ? (products.find(function (p) { return p.slug === c.product_slug; }) || {}).name : null;
+                var disc = c.discount_type === 'percent' ? Number(c.discount_value) + '% off' : money(c.discount_value) + ' off';
+                var usage = c.max_uses ? c.used_count + ' / ' + c.max_uses : c.used_count + ' used';
+                var expired = c.expires_at && new Date(c.expires_at) <= Date.now();
+                return '<div class="data-row" data-id="' + esc(c.id) + '">' +
+                    '<div class="data-left">' +
+                        '<span class="data-title mono">' + esc(c.code) + '</span>' +
+                        '<span class="data-sub">' + disc + ' · ' + esc(prod || 'All products') + ' · ' + usage + (c.expires_at ? ' · expires ' + fmtDT(c.expires_at) : '') + '</span>' +
+                    '</div>' +
+                    '<div class="data-right">' +
+                        '<span class="tag ' + (!c.active ? 'neutral' : (expired ? 'expired' : 'active')) + '">' + (!c.active ? 'off' : (expired ? 'expired' : 'active')) + '</span>' +
+                        '<button type="button" class="admin-btn ghost sm cpl-toggle">' + (c.active ? 'Disable' : 'Enable') + '</button>' +
+                        '<button type="button" class="admin-btn danger sm cpl-del">Delete</button>' +
+                    '</div>' +
+                '</div>';
+            }).join('');
+
+            wrap.querySelectorAll('.cpl-toggle').forEach(function (btn) {
+                btn.addEventListener('click', async function () {
+                    var id = btn.closest('.data-row').getAttribute('data-id');
+                    var c = couponsCache.find(function (x) { return x.id === id; });
+                    if (!c) return;
+                    btn.disabled = true;
+                    var { error } = await sb.from('coupons').update({ active: !c.active }).eq('id', id);
+                    btn.disabled = false;
+                    if (error) { toast('Update failed: ' + error.message, true); return; }
+                    audit('coupon', c.code, c.active ? 'disabled' : 'enabled');
+                    loadCoupons();
+                });
+            });
+            wrap.querySelectorAll('.cpl-del').forEach(function (btn) {
+                btn.addEventListener('click', async function () {
+                    var id = btn.closest('.data-row').getAttribute('data-id');
+                    var c = couponsCache.find(function (x) { return x.id === id; });
+                    btn.disabled = true;
+                    var { error } = await sb.from('coupons').delete().eq('id', id);
+                    if (error) { toast('Delete failed: ' + error.message, true); btn.disabled = false; return; }
+                    audit('coupon', c ? c.code : id, 'deleted');
+                    loadCoupons();
+                });
+            });
+        }
+
+        document.getElementById('cpl-create').addEventListener('click', async function () {
+            var code = (document.getElementById('cpl-code').value || '').trim().toUpperCase();
+            var type = document.getElementById('cpl-type').value;
+            var value = parseFloat(document.getElementById('cpl-value').value);
+            var scope = document.getElementById('cpl-product').value;
+            var maxRaw = document.getElementById('cpl-max').value;
+            var expires = document.getElementById('cpl-expires').value;
+            if (!code) { toast('Code required', true); return; }
+            if (isNaN(value) || value <= 0) { toast('Enter a valid value', true); return; }
+            var btn = document.getElementById('cpl-create');
+            btn.disabled = true;
+            var { error } = await sb.from('coupons').insert({
+                code: code,
+                discount_type: type,
+                discount_value: value,
+                product_slug: scope || null,
+                max_uses: maxRaw ? parseInt(maxRaw, 10) : null,
+                expires_at: expires ? new Date(expires).toISOString() : null
+            });
+            btn.disabled = false;
+            if (error) { toast('Create failed: ' + error.message, true); return; }
+            toast('Coupon ' + code + ' created');
+            audit('coupon', code, (type === 'percent' ? value + '%' : money(value)) + ' off · ' + (scope || 'all products'));
+            document.getElementById('cpl-code').value = '';
+            document.getElementById('cpl-value').value = '';
+            document.getElementById('cpl-max').value = '';
+            document.getElementById('cpl-expires').value = '';
+            loadCoupons();
+        });
+
+        // ── Licenses (KeyAuth proxy) ──
+        async function ka(body) {
+            if (!window.KEYAUTH_PROXY) throw new Error('KEYAUTH_PROXY not set');
+            var session = await R.getSession();
+            var res = await fetch(window.KEYAUTH_PROXY, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + (session ? session.access_token : window.SUPABASE_ANON_KEY)
+                },
+                body: JSON.stringify(body)
+            });
+            var out = await res.json().catch(function () { return {}; });
+            if (!res.ok || out.success === false) throw new Error(out.error || ('Proxy HTTP ' + res.status));
+            return out;
+        }
+
+        function licSetupState() {
+            var configured = !!window.KEYAUTH_PROXY;
+            document.getElementById('lic-setup').hidden = configured;
+            document.getElementById('lic-app').hidden = !configured;
+        }
+
+        async function loadLicenses() {
+            licSetupState();
+            if (!window.KEYAUTH_PROXY) return;
+            var wrap = document.getElementById('lic-list');
+            var { data, error } = await sb
+                .from('licenses')
+                .select('id, code, product_slug, status, created_at')
+                .order('created_at', { ascending: false });
+            if (error) { wrap.innerHTML = '<div class="admin-empty">Could not load keys — run admin-setup-v2.sql.</div>'; return; }
+            var rows = data || [];
+            document.getElementById('lic-count-sub').textContent = rows.length + ' key' + (rows.length === 1 ? '' : 's') + ' on record';
+            if (!rows.length) { wrap.innerHTML = '<div class="admin-empty">No keys generated yet.</div>'; return; }
+            wrap.innerHTML = rows.map(function (k) {
+                var prod = k.product_slug ? (products.find(function (p) { return p.slug === k.product_slug; }) || {}).name : null;
+                var cls = k.status === 'revoked' ? 'revoked' : (k.status === 'expired' ? 'expired' : 'active');
+                return '<div class="data-row" data-id="' + esc(k.id) + '" data-code="' + esc(k.code) + '">' +
+                    '<div class="data-left">' +
+                        '<span class="data-title mono">' + esc(k.code) + '</span>' +
+                        '<span class="data-sub">' + esc(prod || 'general') + ' · ' + fmtDT(k.created_at) + '</span>' +
+                    '</div>' +
+                    '<div class="data-right">' +
+                        '<span class="tag ' + cls + '">' + esc(k.status) + '</span>' +
+                        (k.status === 'active' ? '<button type="button" class="admin-btn danger sm lic-revoke">Revoke</button>' : '') +
+                    '</div>' +
+                '</div>';
+            }).join('');
+
+            wrap.querySelectorAll('.lic-revoke').forEach(function (btn) {
+                btn.addEventListener('click', async function () {
+                    var row = btn.closest('.data-row');
+                    var code = row.getAttribute('data-code');
+                    btn.disabled = true;
+                    try {
+                        var resp = await ka({ action: 'revoke', key: code });
+                        if (!resp.success) throw new Error(resp.error || 'KeyAuth rejected');
+                        var { error } = await sb.from('licenses').update({ status: 'revoked' }).eq('code', code);
+                        if (error) throw new Error(error.message);
+                        toast('Revoked ' + code);
+                        audit('license', code, 'revoked');
+                        alertDiscord('License revoked', '`' + code + '`', 0xef4444);
+                        loadLicenses();
+                    } catch (e) {
+                        toast('Revoke failed: ' + e.message, true);
+                        btn.disabled = false;
+                    }
+                });
+            });
+        }
+
+        document.getElementById('lic-create').addEventListener('click', async function () {
+            var count = Math.max(1, Math.min(25, parseInt(document.getElementById('lic-count').value, 10) || 1));
+            var prefix = document.getElementById('lic-prefix').value.trim() || 'VADE-';
+            var slug = document.getElementById('lic-product').value;
+            var btn = document.getElementById('lic-create');
+            var out = document.getElementById('lic-out');
+            btn.disabled = true;
+            btn.textContent = 'Generating…';
+            try {
+                var resp = await ka({ action: 'create', count: count, prefix: prefix });
+                if (!resp.success || !resp.keys || !resp.keys.length) throw new Error(resp.error || 'KeyAuth returned no keys');
+                var rows = resp.keys.map(function (k) { return { code: k, product_slug: slug }; });
+                var { error } = await sb.from('licenses').insert(rows);
+                if (error) throw new Error(error.message);
+                out.innerHTML = resp.keys.map(function (k) {
+                    return '<span class="license-key">' + esc(k) + '</span>';
+                }).join('');
+                toast(resp.keys.length + ' key' + (resp.keys.length === 1 ? '' : 's') + ' generated');
+                audit('license', slug, resp.keys.length + ' key(s) generated');
+                alertDiscord('Keys generated', count + ' new license key(s) for **' + slug + '**', 0x8b5cf6);
+                loadLicenses();
+            } catch (e) {
+                toast('Generate failed: ' + e.message, true);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Generate keys';
+            }
+        });
+
+        document.getElementById('lic-check').addEventListener('click', async function () {
+            var key = (document.getElementById('lic-check-input').value || '').trim();
+            if (!key) { toast('Enter a key', true); return; }
+            var out = document.getElementById('lic-check-out');
+            var btn = document.getElementById('lic-check');
+            btn.disabled = true;
+            out.innerHTML = '<div class="admin-empty">Checking…</div>';
+            try {
+                var resp = await ka({ action: 'check', key: key });
+                if (resp.success && resp.user) {
+                    var u = resp.user;
+                    out.innerHTML = '<div class="lookup-result">' +
+                        '<div class="lookup-line"><span>Key</span><span class="mono">' + esc(key) + '</span></div>' +
+                        '<div class="lookup-line"><span>Status</span><span class="tag valid">valid</span></div>' +
+                        '<div class="lookup-line"><span>Username</span><span>' + esc(u.username || '—') + '</span></div>' +
+                        '<div class="lookup-line"><span>Created</span><span>' + esc(u.created || '—') + '</span></div>' +
+                        '<div class="lookup-line"><span>Expiry</span><span>' + esc(u.expiry || 'never') + '</span></div>' +
+                        '<div class="lookup-line"><span>Subscriptions</span><span>' + esc((u.subscriptions && u.subscriptions.length) || 0) + '</span></div>' +
+                    '</div>';
+                } else {
+                    out.innerHTML = '<div class="lookup-result">' +
+                        '<div class="lookup-line"><span>Key</span><span class="mono">' + esc(key) + '</span></div>' +
+                        '<div class="lookup-line"><span>Status</span><span class="tag invalid">invalid</span></div>' +
+                        '<div class="lookup-line"><span>Detail</span><span>' + esc(resp.error || 'Key not found') + '</span></div>' +
+                    '</div>';
+                }
+            } catch (e) {
+                out.innerHTML = '<div class="admin-empty">Check failed: ' + esc(e.message) + '</div>';
+            } finally {
+                btn.disabled = false;
+            }
+        });
+
+        // ── User lookup ──
+        function doLookup() {
+            var q = (document.getElementById('lookup-input').value || '').trim().toLowerCase();
+            var out = document.getElementById('lookup-out');
+            if (!q) { out.innerHTML = ''; return; }
+            if (!usersCache.length) {
+                out.innerHTML = '<div class="admin-empty">No users loaded.</div>';
+                return;
+            }
+            var hit = usersCache.find(function (u) {
+                return (u.username || '').toLowerCase() === q ||
+                    (u.discord_id && String(u.discord_id) === q) ||
+                    String(u.id).toLowerCase() === q;
+            });
+            if (!hit) {
+                out.innerHTML = '<div class="admin-empty">No user matches “' + esc(q) + '”.</div>';
+                return;
+            }
+            var role = hit.role || 'customer';
+            out.innerHTML = '<div class="lookup-result">' +
+                '<div class="lookup-line"><span>Username</span><span>' + esc(hit.username || 'Unknown') + '</span></div>' +
+                '<div class="lookup-line"><span>Role</span><span class="user-role-badge role-' + esc(role) + '">' + esc(R.LABELS[role] || role) + '</span></div>' +
+                '<div class="lookup-line"><span>Discord ID</span><span class="mono">' + esc(hit.discord_id || 'not linked') + '</span></div>' +
+                '<div class="lookup-line"><span>User UUID</span><span class="mono">' + esc(hit.id) + '</span></div>' +
+                '<div class="lookup-line"><span>Staff</span><span>' + (role === 'customer' ? 'no' : 'yes — ' + esc(R.LABELS[role] || role)) + '</span></div>' +
+            '</div>';
+        }
+        document.getElementById('lookup-find').addEventListener('click', doLookup);
+        document.getElementById('lookup-input').addEventListener('keydown', function (e) { if (e.key === 'Enter') doLookup(); });
+
+        // ── Reviews ──
+        var reviewsCache = [];
+        var reviewsErrored = false;
+
+        async function loadReviews() {
+            var { data, error } = await sb
+                .from('reviews')
+                .select('id, author_id, author_name, product_slug, rating, body, status, created_at')
+                .order('created_at', { ascending: false });
+            reviewsErrored = !!error;
+            reviewsCache = error ? [] : (data || []);
+            var badge = document.getElementById('nav-badge-reviews');
+            if (badge) badge.textContent = reviewsCache.length;
+            renderReviews();
+        }
+
+        function renderReviews() {
+            var wrap = document.getElementById('rev-list');
+            if (reviewsErrored) { wrap.innerHTML = '<div class="admin-empty">Could not load reviews — run admin-setup-v3.sql.</div>'; return; }
+
+            var filter = document.getElementById('rev-filter').value;
+            var rows = reviewsCache.filter(function (r) { return filter === 'all' || r.status === filter; });
+
+            var pub = reviewsCache.filter(function (r) { return r.status === 'published'; });
+            var avg = pub.length ? (pub.reduce(function (s, r) { return s + (r.rating || 0); }, 0) / pub.length) : 0;
+            document.getElementById('rev-count').textContent =
+                reviewsCache.length + ' total · ' + pub.length + ' published · avg ★' + (pub.length ? avg.toFixed(1) : '—');
+
+            if (!rows.length) { wrap.innerHTML = '<div class="admin-empty">' + (reviewsCache.length ? 'Nothing matches this filter.' : 'No reviews yet.') + '</div>'; return; }
+
+            wrap.innerHTML = rows.map(function (r) {
+                var starStr = '';
+                for (var i = 1; i <= 5; i++) starStr += i <= r.rating ? '★' : '☆';
+                var d = new Date(r.created_at);
+                var when = isNaN(d) ? '' : d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+                var hidden = r.status === 'hidden';
+                return '<div class="data-row" data-id="' + esc(r.id) + '">' +
+                    '<div class="data-left">' +
+                        '<span class="data-title"><span class="rev-stars">' + starStr + '</span> ' + esc(r.author_name) + '</span>' +
+                        '<span class="data-sub">' + esc(window.VadeReviews ? window.VadeReviews.label(r.product_slug) : (r.product_slug || 'Vade')) + (when ? ' · ' + esc(when) : '') + ' — ' + esc(r.body) + '</span>' +
+                    '</div>' +
+                    '<div class="data-right">' +
+                        '<span class="tag ' + (hidden ? 'neutral' : 'active') + '">' + (hidden ? 'hidden' : 'published') + '</span>' +
+                        '<button type="button" class="admin-btn ghost sm rev-toggle">' + (hidden ? 'Restore' : 'Hide') + '</button>' +
+                        '<button type="button" class="admin-btn danger sm rev-del">Delete</button>' +
+                    '</div>' +
+                '</div>';
+            }).join('');
+
+            wrap.querySelectorAll('.rev-toggle').forEach(function (btn) {
+                btn.addEventListener('click', async function () {
+                    var id = btn.closest('.data-row').getAttribute('data-id');
+                    var r = reviewsCache.find(function (x) { return x.id === id; });
+                    if (!r) return;
+                    btn.disabled = true;
+                    var next = r.status === 'hidden' ? 'published' : 'hidden';
+                    var { error } = await sb.from('reviews').update({ status: next }).eq('id', id);
+                    btn.disabled = false;
+                    if (error) { toast('Update failed: ' + error.message, true); return; }
+                    audit('review', r.author_name, next === 'hidden' ? 'review hidden' : 'review restored');
+                    loadReviews();
+                });
+            });
+            wrap.querySelectorAll('.rev-del').forEach(function (btn) {
+                btn.addEventListener('click', async function () {
+                    var id = btn.closest('.data-row').getAttribute('data-id');
+                    var r = reviewsCache.find(function (x) { return x.id === id; });
+                    btn.disabled = true;
+                    var { error } = await sb.from('reviews').delete().eq('id', id);
+                    if (error) { toast('Delete failed: ' + error.message, true); btn.disabled = false; return; }
+                    audit('review', r ? r.author_name : id, 'review deleted');
+                    loadReviews();
+                });
+            });
+        }
+        document.getElementById('rev-filter').addEventListener('change', renderReviews);
+
+        // ── Audit log ──
+        var auditCache = [];
+
+        async function loadAudit() {
+            var { data, error } = await sb
+                .from('audit_log')
+                .select('id, actor, action, target, detail, created_at')
+                .order('created_at', { ascending: false })
+                .limit(100);
+            auditCache = error ? [] : (data || []);
+            renderAudit(error);
+        }
+
+        function renderAudit(loadError) {
+            var wrap = document.getElementById('audit-list');
+            if (loadError) { wrap.innerHTML = '<div class="admin-empty">Could not load audit log — run admin-setup-v2.sql.</div>'; return; }
+            var q = (document.getElementById('audit-search').value || '').trim().toLowerCase();
+            var f = document.getElementById('audit-filter').value || 'all';
+            var rows = auditCache.filter(function (a) {
+                if (f !== 'all' && a.action !== f) return false;
+                if (q) {
+                    var hay = ((a.actor || '') + ' ' + (a.action || '') + ' ' + (a.target || '') + ' ' + (a.detail || '')).toLowerCase();
+                    if (hay.indexOf(q) === -1) return false;
+                }
+                return true;
+            });
+            document.getElementById('audit-count').textContent = rows.length + ' of ' + auditCache.length + ' entries';
+            if (!rows.length) { wrap.innerHTML = '<div class="admin-empty">Nothing logged yet.</div>'; return; }
+            wrap.innerHTML = rows.map(function (a) {
+                var d = new Date(a.created_at);
+                var time = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) + ' ' +
+                    d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+                return '<div class="audit-row">' +
+                    '<span class="audit-time">' + esc(time) + '</span>' +
+                    '<span class="audit-actor">' + esc(a.actor || 'system') + '</span>' +
+                    '<span class="audit-action">' + esc(a.action) + '</span>' +
+                    '<span class="audit-detail">' + esc(a.target || '') + (a.detail ? ' — ' + esc(a.detail) : '') + '</span>' +
+                '</div>';
+            }).join('');
+        }
+        document.getElementById('audit-search').addEventListener('input', function () { renderAudit(); });
+        document.getElementById('audit-filter').addEventListener('change', function () { renderAudit(); });
+
+        function hookState() {
+            var el = document.getElementById('hook-status');
+            if (!el) return;
+            el.textContent = window.DISCORD_WEBHOOK_URL
+                ? 'Webhook configured — fires on status flips, maintenance, and key events'
+                : 'No webhook set — add DISCORD_WEBHOOK_URL to config.js';
+        }
+        document.getElementById('hook-test').addEventListener('click', async function () {
+            if (!window.DISCORD_WEBHOOK_URL) { toast('No webhook configured', true); return; }
+            var ok = await alertDiscord('Test alert', 'Vade Control → Discord pipeline is live.', 0x8b5cf6);
+            toast(ok ? 'Test alert sent' : 'Discord rejected the webhook', !ok);
+        });
+
+        // ── Boot ──
+        async function boot() {
+            var session = await R.getSession();
+            if (!session) {
+                window.location.href = '/login/';
+                return;
+            }
+            me = await R.require('staff', { redirect: false });
+            if (!me) {
+                document.getElementById('admin-denied').hidden = false;
+                return;
+            }
+            document.getElementById('admin-app').hidden = false;
+            document.getElementById('admin-me-name').textContent = me.username || 'Unknown';
+            var badge = document.getElementById('admin-me-role');
+            badge.textContent = R.LABELS[me.role] || me.role;
+            badge.className = 'user-role-badge role-' + me.role;
+
+            if (R.atLeast(me.role, 'co_owner')) {
+                document.getElementById('tab-staff').hidden = false;
+            }
+
+            document.getElementById('cl-date').value = todayLabel();
+            var schedUntil = document.getElementById('sched-until');
+            if (schedUntil && !schedUntil.value) {
+                var def = new Date(Date.now() + 2 * 36e5);
+                def.setMinutes(def.getMinutes() - def.getTimezoneOffset());
+                schedUntil.value = def.toISOString().slice(0, 16);
+            }
+            hookState();
+            addItemRow('fixed', '');
+            await loadProducts();
+            await loadChangelogs();
+            await fetchUsers();
+            loadReviews();
+            renderOverview();
+
+            var initial = location.hash.slice(1);
+            activateTab(TAB_META[initial] ? initial : 'overview');
+        }
+
+        boot();
+    })();
+    </script>
+</body>
+</html>

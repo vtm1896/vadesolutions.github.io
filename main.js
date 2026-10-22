@@ -375,14 +375,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ── Search System ──
     const SEARCH_INDEX = [
-        { name: 'Rust Internal',   tags: ['rust', 'internal', 'aimbot', 'esp', 'cheat'],      url: 'rust-internal.html' },
-        { name: 'Rust External',   tags: ['rust', 'external', 'overlay', 'streamproof'],       url: 'rust-external.html' },
-        { name: 'Vade Executor',   tags: ['roblox', 'executor', 'script', 'byfron', 'level 8'], url: 'roblox-exec.html' },
-        { name: 'Roblox External', tags: ['roblox', 'external', 'aimbot', 'esp', 'universal'],  url: 'roblox-ext.html' },
-        { name: 'Products',        tags: ['products', 'catalog', 'buy'],                        url: 'products.html' },
-        { name: 'Status',          tags: ['status', 'uptime', 'online', 'offline'],             url: 'status.html' },
-        { name: 'Rate Us',         tags: ['rate', 'review', 'feedback'],                        url: 'rate.html' },
-        { name: 'Terms of Service',tags: ['tos', 'terms', 'refund', 'policy'],                  url: 'tos.html' },
+        { name: 'Rust Internal',   tags: ['rust', 'internal', 'aimbot', 'esp', 'cheat'],      url: '/rust-internal/' },
+        { name: 'Rust External',   tags: ['rust', 'external', 'overlay', 'streamproof'],       url: '/rust-external/' },
+        { name: 'Vade Executor',   tags: ['roblox', 'executor', 'script', 'byfron', 'level 8'], url: '/roblox-exec/' },
+        { name: 'Roblox External', tags: ['roblox', 'external', 'aimbot', 'esp', 'universal'],  url: '/roblox-ext/' },
+        { name: 'Products',        tags: ['products', 'catalog', 'buy'],                        url: '/products/' },
+        { name: 'Status',          tags: ['status', 'uptime', 'online', 'offline'],             url: '/status/' },
+        { name: 'Rate Us',         tags: ['rate', 'review', 'feedback'],                        url: '/rate/' },
+        { name: 'Terms of Service',tags: ['tos', 'terms', 'refund', 'policy'],                  url: '/tos/' },
     ];
 
     // Build dropdown UI once
@@ -509,7 +509,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
 
                 var adminItemHtml = isStaff ? `
-                        <a href="admin.html" class="user-dropdown-item" role="menuitem">
+                        <a href="/admin/" class="user-dropdown-item" role="menuitem">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                             Admin Panel
                         </a>` : '';
@@ -537,15 +537,15 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                         <div class="user-dropdown-divider"></div>
-                        <a href="dashboard.html" class="user-dropdown-item" role="menuitem">
+                        <a href="/dashboard/" class="user-dropdown-item" role="menuitem">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                             Dashboard
                         </a>
-                        <a href="dashboard.html#subscriptions" class="user-dropdown-item" role="menuitem">
+                        <a href="/dashboard/#subscriptions" class="user-dropdown-item" role="menuitem">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
                             Subscriptions
                         </a>
-                        <a href="dashboard.html#loader" class="user-dropdown-item" role="menuitem">
+                        <a href="/dashboard/#loader" class="user-dropdown-item" role="menuitem">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                             Download
                         </a>
@@ -587,7 +587,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 wrapper.querySelector('#nav-logout').addEventListener('click', async function (e) {
                     e.preventDefault();
                     await sb.auth.signOut();
-                    window.location.href = 'login.html';
+                    window.location.href = '/login/';
                 });
             }
         }).catch(function (err) {
@@ -624,3 +624,45 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(err => console.error("Error fetching Discord widget data:", err));
 });
+
+// -- Instant navigation: prefetch on intent + smooth exit fade --
+(function () {
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var seen = Object.create(null);
+
+    function prefetch(href) {
+        if (seen[href]) return;
+        seen[href] = 1;
+        var l = document.createElement('link');
+        l.rel = 'prefetch';
+        l.as = 'document';
+        l.href = href;
+        document.head.appendChild(l);
+    }
+
+    function internalAnchor(e) {
+        var a = e.target && e.target.closest && e.target.closest('a[href^="/"]');
+        return a && a.host === location.host ? a : null;
+    }
+
+    document.addEventListener('mouseover', function (e) {
+        var a = internalAnchor(e);
+        if (a) prefetch(a.pathname + a.search + a.hash);
+    }, { passive: true });
+
+    document.addEventListener('touchstart', function (e) {
+        var a = internalAnchor(e);
+        if (a) prefetch(a.pathname + a.search + a.hash);
+    }, { passive: true });
+
+    document.addEventListener('click', function (e) {
+        if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        var a = internalAnchor(e);
+        if (!a || a.target === '_blank' || a.hasAttribute('download')) return;
+        if (a.pathname === location.pathname && a.search === location.search) return;
+        if (reduce) return;
+        e.preventDefault();
+        document.body.classList.add('nav-exit');
+        setTimeout(function () { location.href = a.href; }, 140);
+    });
+})();

@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Vade - System Status</title>
+    <link rel="icon" type="image/png" href="/NEW_VADE_LOGO-removebg-preview.png?v=11">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Vade">
+    <meta property="og:title" content="Vade - System Status">
+    <meta property="og:description" content="Vade - premium, reliable toolset built for performance, security, and a seamless experience.">
+    <meta property="og:url" content="https://vadesolutions.fun/status/">
+    <meta property="og:image" content="https://vadesolutions.fun/NEW_VADE_LOGO-removebg-preview.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="theme-color" content="#050505">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/style.css?v=11">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <img src="" alt="Vade" class="logo-img" id="nav-logo">
+            </a>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/products/">Products</a>
+                <a href="/status/" class="active">Status</a>
+                <a href="/rate/">Rate Us</a>
+            </div>
+            <div class="nav-actions">
+                <!-- Online Count -->
+                <div class="nav-online">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1" fill="currentColor"/></svg>
+                    <span id="online-count">0 online</span>
+                </div>
+
+                <!-- Resell Button -->
+                <a href="#" class="btn-resell">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    Resell
+                </a>
+
+                <!-- Sign In -->
+                <a href="/login/" class="btn-signin" id="discord-login-btn">
+                    Sign In
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="page-section first">
+        <div class="container fade-in-up">
+            <div class="section-header">
+                <h2>Status</h2>
+                <p>Real-time status of all Vade products.</p>
+            </div>
+            
+            <div class="status-page-wrap">
+                <!-- Info Banner -->
+                <div class="status-info-banner fade-in-up" style="transition-delay: 0.1s;">
+                    <div class="status-info-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    </div>
+                    <div class="status-info-text">
+                        Status data comes directly from product data. It may not reflect real-time changes. <a href="https://discord.gg/cSyWtkTaAj">Join Discord</a> for urgent/live updates. Last known issues are manually maintained.
+                    </div>
+                </div>
+
+                <!-- Alert Bar (Disruption) -->
+                <div class="status-alert-bar disruption fade-in-up" style="transition-delay: 0.15s;">
+                    <div class="dot"></div>
+                    Service Disruption
+                </div>
+
+                <!-- Rust Group -->
+                <div class="status-group fade-in-up" style="transition-delay: 0.2s;">
+                    <div class="status-group-header">
+                        <div class="status-group-title">
+                            <div class="status-group-dot"></div>
+                            Rust
+                        </div>
+                        <div class="status-group-count">2</div>
+                    </div>
+                    
+                    <!-- Rust Internal -->
+                    <div class="status-product-row s-online" data-product-row="rust-internal">
+                        <div class="status-product-top">
+                            <span class="status-product-name">Rust Internal</span>
+                            <span class="status-pill online"><div class="pill-dot"></div> <span class="status-pill-text">Operational</span></span>
+                        </div>
+                        <div class="status-product-meta">
+                            <span class="status-product-desc">Currently available and undetected</span>
+                            <div class="status-product-actions">
+                                <button type="button" class="status-changelog-btn" data-changelog="rust-internal">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                                    Changelog
+                                </button>
+                                <a href="/rust-internal/" class="status-view-link">View product <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg></a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Rust External (Offline for example) -->
+                    <div class="status-product-row s-offline" data-product-row="rust-external">
+                        <div class="status-product-top">
+                            <span class="status-product-name">Rust External</span>
+                            <span class="status-pill offline"><div class="pill-dot"></div> <span class="status-pill-text">Offline</span></span>
+                        </div>
+                        <div class="status-product-meta">
+                            <span class="status-product-desc">Currently unavailable for maintenance</span>
+                            <div class="status-product-actions">
+                                <button type="button" class="status-changelog-btn" data-changelog="rust-external">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                                    Changelog
+                                </button>
+                                <a href="/rust-external/" class="status-view-link">View product <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Roblox Group -->
+                <div class="status-group fade-in-up" style="transition-delay: 0.25s;">
+                    <div class="status-group-header">
+                        <div class="status-group-title">
+                            <div class="status-group-dot"></div>
+                            Roblox
+                        </div>
+                        <div class="status-group-count">2</div>
+                    </div>
+                    
+                    <!-- Roblox Executor -->
+                    <div class="status-product-row s-online" data-product-row="roblox-exec">
+                        <div class="status-product-top">
+                            <span class="status-product-name">Vade Executor</span>
+                            <span class="status-pill online"><div class="pill-dot"></div> <span class="status-pill-text">Operational</span></span>
+                        </div>
+                        <div class="status-product-meta">
+                            <span class="status-product-desc">Currently available and undetected</span>
+                            <div class="status-product-actions">
+                                <button type="button" class="status-changelog-btn" data-changelog="roblox-exec">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                                    Changelog
+                                </button>
+                                <a href="/roblox-exec/" class="status-view-link">View product <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg></a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Roblox External -->
+                    <div class="status-product-row s-online" data-product-row="roblox-ext">
+                        <div class="status-product-top">
+                            <span class="status-product-name">Roblox External</span>
+                            <span class="status-pill online"><div class="pill-dot"></div> <span class="status-pill-text">Operational</span></span>
+                        </div>
+                        <div class="status-product-meta">
+                            <span class="status-product-desc">Currently available and undetected</span>
+                            <div class="status-product-actions">
+                                <button type="button" class="status-changelog-btn" data-changelog="roblox-ext">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                                    Changelog
+                                </button>
+                                <a href="/roblox-ext/" class="status-view-link">View product <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Changelog Modal -->
+    <div class="changelog-overlay" id="changelog-overlay" hidden>
+        <div class="changelog-modal" role="dialog" aria-modal="true" aria-labelledby="changelog-title">
+            <div class="changelog-header">
+                <div class="changelog-header-info">
+                    <div class="changelog-header-label">Patch notes</div>
+                    <h3 id="changelog-title">Product</h3>
+                    <div class="changelog-header-meta">
+                        <span class="changelog-latest-version" id="changelog-latest-version"></span>
+                        <span class="changelog-entry-count" id="changelog-entry-count"></span>
+                    </div>
+                </div>
+                <button type="button" class="changelog-close" id="changelog-close" aria-label="Close changelog">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="changelog-body" id="changelog-body"></div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-left">
+                <div class="logo">Vade</div>
+                <p>&copy; 2026 Vade Software. All rights reserved.</p>
+            </div>
+            <div class="footer-links">
+                <a href="/tos/">Terms of Service</a>
+                <a href="#">Privacy Policy</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="/config.js?v=11"></script>
+    <script src="/supabase-client.js?v=11"></script>
+    <script src="/auth-roles.js?v=11"></script>
+    <script src="/main.js?v=11"></script>
+    <script defer src="/logo-data.js?v=11"></script>
+    <script>
+    (function () {
+        var sb = window.supabaseClient;
+
+        // Fallback patch notes — used only if Supabase query fails (tables not set up yet)
+        var FALLBACK = {
+            'rust-internal': {
+                name: 'Rust Internal',
+                entries: [
+                    { version: 'v2.4.1', date: 'Oct 18, 2026', title: 'Stability pass', items: [
+                        { type: 'fixed', text: 'Fixed rare crash when injecting during loading screens.' },
+                        { type: 'fixed', text: 'Resolved menu flicker on 1440p ultrawide monitors.' },
+                        { type: 'changed', text: 'Reduced idle memory usage by ~35MB.' }
+                    ]},
+                    { version: 'v2.4.0', date: 'Oct 09, 2026', title: 'Rust update support + new visuals', items: [
+                        { type: 'added', text: 'Full support for the latest Rust client update.' },
+                        { type: 'added', text: 'New player ESP glow styles (outline, soft, neon).' },
+                        { type: 'changed', text: 'Rebuilt config system — configs now save per-server.' },
+                        { type: 'removed', text: 'Dropped legacy skin changer (replaced by new one).' }
+                    ]}
+                ]
+            },
+            'rust-external': {
+                name: 'Rust External',
+                entries: [
+                    { version: 'v1.9.3', date: 'Oct 20, 2026', title: 'Maintenance update', items: [
+                        { type: 'changed', text: 'Temporarily offline for maintenance — expect return within 24h.' },
+                        { type: 'fixed', text: 'Patch in progress for latest game build compatibility.' }
+                    ]}
+                ]
+            },
+            'roblox-exec': {
+                name: 'Vade Executor',
+                entries: [
+                    { version: 'v4.1.0', date: 'Oct 16, 2026', title: 'Level 8 unlock + speed', items: [
+                        { type: 'added', text: 'Level 8 support with script hub integration.' },
+                        { type: 'changed', text: 'New bytecode compiler — ~2x faster script injection.' },
+                        { type: 'fixed', text: 'Fixed executor UI lag on low-end machines.' }
+                    ]}
+                ]
+            },
+            'roblox-ext': {
+                name: 'Roblox External',
+                entries: [
+                    { version: 'v3.2.2', date: 'Oct 12, 2026', title: 'Universal ESP polish', items: [
+                        { type: 'changed', text: 'ESP now works across all games without per-game configs.' },
+                        { type: 'fixed', text: 'Fixed wallhack depth buffer on Vulkan-rendered games.' },
+                        { type: 'added', text: 'Tracer lines with distance-based fade.' }
+                    ]}
+                ]
+            }
+        };
+
+        var CHANGELOGS = JSON.parse(JSON.stringify(FALLBACK));
+        var dbReady = false;
+
+        var STATUS_OF = { 'rust-internal': 'online', 'rust-external': 'offline', 'roblox-exec': 'online', 'roblox-ext': 'online' };
+
+        function renderUptime() {
+            if (!window.VadeUptime) return;
+            Object.keys(STATUS_OF).forEach(function (slug) {
+                var row = document.querySelector('[data-product-row="' + slug + '"]');
+                if (!row) return;
+                var inner = window.VadeUptime.html(slug, STATUS_OF[slug], 'thin');
+                var strip = row.querySelector('.uptime-strip');
+                if (strip) {
+                    strip.innerHTML = inner;
+                    return;
+                }
+                var el = document.createElement('div');
+                el.className = 'uptime-strip';
+                el.innerHTML = inner;
+                row.appendChild(el);
+            });
+        }
+
+        var STATUS_LABELS = { online: 'Operational', offline: 'Offline', updating: 'Updating' };
+
+        // ── Load live product statuses ──
+        async function loadStatuses() {
+            if (!sb) return;
+            var { data, error } = await sb
+                .from('products')
+                .select('slug, name, status, description');
+            if (error || !data) return;
+            data.forEach(function (p) {
+                var row = document.querySelector('[data-product-row="' + p.slug + '"]');
+                if (!row) return;
+                var pill = row.querySelector('.status-pill');
+                var pillText = row.querySelector('.status-pill-text');
+                var desc = row.querySelector('.status-product-desc');
+                if (pill) {
+                    pill.className = 'status-pill ' + p.status;
+                }
+                if (pillText) {
+                    pillText.textContent = STATUS_LABELS[p.status] || p.status;
+                }
+                if (desc && p.description) {
+                    desc.textContent = p.description;
+                }
+                row.className = 'status-product-row s-' + p.status;
+                row.setAttribute('data-product-row', p.slug);
+                STATUS_OF[p.slug] = p.status;
+            });
+        }
+
+        // ── Load patch notes from DB ──
+        async function loadChangelogData() {
+            if (!sb) return;
+            var { data, error } = await sb
+                .from('product_changelog')
+                .select('product_slug, version, title, entry_date, items, created_at')
+                .order('created_at', { ascending: false });
+            if (error || !data) return; // keep fallback
+
+            dbReady = true;
+            // group by slug, keep DB order (newest first)
+            var grouped = {};
+            data.forEach(function (e) {
+                if (!grouped[e.product_slug]) grouped[e.product_slug] = [];
+                grouped[e.product_slug].push({
+                    version: e.version,
+                    date: e.entry_date,
+                    title: e.title,
+                    items: e.items || []
+                });
+            });
+            Object.keys(CHANGELOGS).forEach(function (slug) {
+                if (grouped[slug] && grouped[slug].length) {
+                    CHANGELOGS[slug].entries = grouped[slug];
+                }
+            });
+            // include slugs that only exist in DB
+            Object.keys(grouped).forEach(function (slug) {
+                if (!CHANGELOGS[slug]) {
+                    CHANGELOGS[slug] = { name: slug, entries: grouped[slug] };
+                }
+            });
+        }
+
+        // ── Modal ──
+        var overlay = document.getElementById('changelog-overlay');
+        var titleEl = document.getElementById('changelog-title');
+        var latestEl = document.getElementById('changelog-latest-version');
+        var countEl = document.getElementById('changelog-entry-count');
+        var bodyEl = document.getElementById('changelog-body');
+        var closeBtn = document.getElementById('changelog-close');
+
+        function escapeHtml(str) {
+            return String(str).replace(/[&<>"']/g, function (c) {
+                return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+            });
+        }
+
+        function openChangelog(key) {
+            var data = CHANGELOGS[key];
+            if (!data) return;
+
+            titleEl.textContent = data.name || key;
+            var entries = data.entries || [];
+            latestEl.textContent = entries.length ? entries[0].version : '—';
+            countEl.textContent = (dbReady ? '' : 'sample · ') + (entries.length === 1 ? '1 update' : entries.length + ' updates');
+
+            if (!entries.length) {
+                bodyEl.innerHTML = '<div class="changelog-empty">No patch notes yet.</div>';
+            } else {
+                bodyEl.innerHTML = entries.map(function (e) {
+                    var items = (e.items || []).map(function (it) {
+                        return '<li><span class="changelog-tag ' + escapeHtml(it.type) + '">' + escapeHtml(it.type) + '</span><span>' + escapeHtml(it.text) + '</span></li>';
+                    }).join('');
+                    return '<div class="changelog-entry">' +
+                        '<div class="changelog-entry-top">' +
+                            '<span class="changelog-entry-version"><span class="ver-dot"></span>' + escapeHtml(e.version) + '</span>' +
+                            '<span class="changelog-entry-date">' + escapeHtml(e.date) + '</span>' +
+                        '</div>' +
+                        (e.title ? '<div class="changelog-entry-title">' + escapeHtml(e.title) + '</div>' : '') +
+                        '<ul class="changelog-entry-list">' + items + '</ul>' +
+                    '</div>';
+                }).join('');
+            }
+
+            overlay.hidden = false;
+            void overlay.offsetWidth;
+            overlay.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeChangelog() {
+            overlay.classList.remove('open');
+            document.body.style.overflow = '';
+            setTimeout(function () {
+                if (!overlay.classList.contains('open')) overlay.hidden = true;
+            }, 250);
+        }
+
+        document.querySelectorAll('.status-changelog-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                openChangelog(btn.getAttribute('data-changelog'));
+            });
+        });
+
+        closeBtn.addEventListener('click', closeChangelog);
+
+        overlay.addEventListener('click', function (e) {
+            if (e.target === overlay) closeChangelog();
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && !overlay.hidden) closeChangelog();
+        });
+
+        // ── Init ──
+        async function revertIfDue() {
+            if (!sb) return;
+            try { await sb.rpc('revert_expired_maintenance'); } catch (e) {}
+        }
+        renderUptime();
+        revertIfDue().then(function () {
+            loadStatuses().then(renderUptime);
+        });
+        loadChangelogData();
+    })();
+    </script>
+</body>
+</html>

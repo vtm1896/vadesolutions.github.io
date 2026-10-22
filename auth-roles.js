@@ -57,11 +57,11 @@
         opts = opts || {};
         var profile = await getProfile();
         if (!profile) {
-            if (opts.redirect !== false) window.location.href = 'login.html';
+            if (opts.redirect !== false) window.location.href = '/login/';
             return null;
         }
         if (!atLeast(profile.role, min)) {
-            if (opts.redirect !== false) window.location.href = 'dashboard.html';
+            if (opts.redirect !== false) window.location.href = '/dashboard/';
             return null;
         }
         return profile;

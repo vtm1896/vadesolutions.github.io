@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Vade - Page Not Found</title>
-    <link rel="icon" type="image/png" href="/NEW_VADE_LOGO-removebg-preview.png?v=10">
+    <link rel="icon" type="image/png" href="/NEW_VADE_LOGO-removebg-preview.png?v=11">
     <meta name="theme-color" content="#050505">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -88,6 +88,32 @@
             .nf-code { font-size: 3.5rem; }
         }
     </style>
+    <script>
+    (function () {
+        var p = location.pathname.replace(/\/+$/, '');
+        if (!/\.html?$/i.test(p)) return;
+        var base = p.replace(/\.html?$/i, '');
+        var map = {
+            '': '/', '/': '/', '/index': '/',
+            '/products': '/products/',
+            '/rust-internal': '/rust-internal/',
+            '/rust-external': '/rust-external/',
+            '/roblox-exec': '/roblox-exec/',
+            '/roblox-ext': '/roblox-ext/',
+            '/status': '/status/',
+            '/rate': '/rate/',
+            '/tos': '/tos/',
+            '/login': '/login/',
+            '/register': '/register/',
+            '/join-discord': '/join-discord/',
+            '/dashboard': '/dashboard/',
+            '/admin': '/admin/'
+        };
+        var t = map[base];
+        if (!t) return;
+        location.replace(t + location.search + location.hash);
+    })();
+    </script>
 </head>
 <body>
     <main class="nf-card">
@@ -99,7 +125,7 @@
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
                 Back home
             </a>
-            <a href="/products.html" class="nf-btn nf-ghost">Browse products</a>
+            <a href="/products/" class="nf-btn nf-ghost">Browse products</a>
         </div>
     </main>
 </body>

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Vade - Products</title>
+    <link rel="icon" type="image/png" href="/NEW_VADE_LOGO-removebg-preview.png?v=11">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Vade">
+    <meta property="og:title" content="Vade - Products">
+    <meta property="og:description" content="Browse all Vade premium tools for Rust and Roblox. Undetected, fast, and reliable.">
+    <meta property="og:url" content="https://vadesolutions.fun/products/">
+    <meta property="og:image" content="https://vadesolutions.fun/NEW_VADE_LOGO-removebg-preview.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="theme-color" content="#050505">
+    <meta name="description" content="Browse all Vade premium tools for Rust and Roblox. Undetected, fast, and reliable.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/style.css?v=11">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <img src="" alt="Vade" class="logo-img" id="nav-logo">
+            </a>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/products/" class="active">Products</a>
+                <a href="/status/">Status</a>
+                <a href="/rate/">Rate Us</a>
+            </div>
+            <div class="nav-actions">
+                <!-- Online Count -->
+                <div class="nav-online">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1" fill="currentColor"/></svg>
+                    <span id="online-count">0 online</span>
+                </div>
+
+                <!-- Resell Button -->
+                <a href="#" class="btn-resell">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    Resell
+                </a>
+
+                <!-- Sign In -->
+                <a href="/login/" class="btn-signin" id="discord-login-btn">
+                    Sign In
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="products-hero">
+        <div class="container">
+            <div class="products-hero-inner fade-in-up">
+                <div class="products-hero-pill">
+                    <span class="products-hero-pill-dot"></span>
+                    Made for your next session
+                </div>
+                <h1>All products</h1>
+                <p>Pick your game. Every product shows its current status before you buy.</p>
+            </div>
+
+            <!-- Toolbar -->
+            <div class="products-toolbar fade-in-up" style="transition-delay: 0.08s;">
+                <div class="filter-pills" id="filter-pills">
+                    <button class="filter-pill active" data-filter="all">All products <span class="filter-count">4</span></button>
+                    <button class="filter-pill" data-filter="rust">Rust <span class="filter-count">2</span></button>
+                    <button class="filter-pill" data-filter="roblox">Roblox <span class="filter-count">2</span></button>
+                </div>
+                <div class="products-search">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" id="product-search" placeholder="Find a product..." autocomplete="off" spellcheck="false">
+                </div>
+            </div>
+
+            <!-- Grid -->
+            <div class="product-grid" id="product-grid">
+                <a href="/rust-internal/" class="product-card fade-in-up" data-category="rust" data-search="rust internal win 10 11 intel amd internal" style="transition-delay: 0.1s;">
+                    <div class="product-card-art art-rust-internal">
+                        <span class="art-initial">RI</span>
+                        <span class="product-card-label">RUST INTERNAL</span>
+                        <span class="product-card-index">01</span>
+                        <span class="product-card-status"><i></i>Undetected</span>
+                    </div>
+                    <div class="product-card-body">
+                        <div class="product-card-info">
+                            <h3>Rust Internal</h3>
+                            <div class="product-card-tags">
+                                <span>Win 10/11</span>
+                                <span>Intel/AMD</span>
+                                <span>Internal</span>
+                            </div>
+                        </div>
+                        <div class="product-card-footer">
+                            <div class="product-card-price">
+                                <span>Starting at</span>
+                                <strong>$15.00</strong>
+                            </div>
+                            <span class="product-card-cta">
+                                Explore product
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                            </span>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="/rust-external/" class="product-card fade-in-up" data-category="rust" data-search="rust external win 10 11 intel amd external" style="transition-delay: 0.16s;">
+                    <div class="product-card-art art-rust-external">
+                        <span class="art-initial">RE</span>
+                        <span class="product-card-label">RUST EXTERNAL</span>
+                        <span class="product-card-index">02</span>
+                        <span class="product-card-status"><i></i>Undetected</span>
+                    </div>
+                    <div class="product-card-body">
+                        <div class="product-card-info">
+                            <h3>Rust External</h3>
+                            <div class="product-card-tags">
+                                <span>Win 10/11</span>
+                                <span>Intel/AMD</span>
+                                <span>External</span>
+                            </div>
+                        </div>
+                        <div class="product-card-footer">
+                            <div class="product-card-price">
+                                <span>Starting at</span>
+                                <strong>$10.00</strong>
+                            </div>
+                            <span class="product-card-cta">
+                                Explore product
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                            </span>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="/roblox-exec/" class="product-card fade-in-up" data-category="roblox" data-search="vade executor roblox win 10 11 level 8 executor" style="transition-delay: 0.22s;">
+                    <div class="product-card-art art-roblox-exec">
+                        <span class="art-initial">VE</span>
+                        <span class="product-card-label">ROBLOX EXECUTOR</span>
+                        <span class="product-card-index">03</span>
+                        <span class="product-card-status"><i></i>Undetected</span>
+                    </div>
+                    <div class="product-card-body">
+                        <div class="product-card-info">
+                            <h3>Vade Executor</h3>
+                            <div class="product-card-tags">
+                                <span>Win 10/11</span>
+                                <span>Level 8</span>
+                                <span>Executor</span>
+                            </div>
+                        </div>
+                        <div class="product-card-footer">
+                            <div class="product-card-price">
+                                <span>Starting at</span>
+                                <strong>$5.00</strong>
+                            </div>
+                            <span class="product-card-cta">
+                                Explore product
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                            </span>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="/roblox-ext/" class="product-card fade-in-up" data-category="roblox" data-search="roblox external universal external win 10 11" style="transition-delay: 0.28s;">
+                    <div class="product-card-art art-roblox-ext">
+                        <span class="art-initial">RX</span>
+                        <span class="product-card-label">ROBLOX EXTERNAL</span>
+                        <span class="product-card-index">04</span>
+                        <span class="product-card-status"><i></i>Undetected</span>
+                    </div>
+                    <div class="product-card-body">
+                        <div class="product-card-info">
+                            <h3>Roblox External</h3>
+                            <div class="product-card-tags">
+                                <span>Win 10/11</span>
+                                <span>Universal</span>
+                                <span>External</span>
+                            </div>
+                        </div>
+                        <div class="product-card-footer">
+                            <div class="product-card-price">
+                                <span>Starting at</span>
+                                <strong>$3.00</strong>
+                            </div>
+                            <span class="product-card-cta">
+                                Explore product
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="product-empty" id="product-empty" hidden>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <span>No products match your search.</span>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-left">
+                <div class="logo">Vade</div>
+                <p>&copy; 2026 Vade Software. All rights reserved.</p>
+            </div>
+            <div class="footer-links">
+                <a href="/tos/">Terms of Service</a>
+                <a href="#">Privacy Policy</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="/config.js?v=11"></script>
+    <script src="/supabase-client.js?v=11"></script>
+    <script src="/auth-roles.js?v=11"></script>
+    <script src="/main.js?v=11"></script>
+    <script defer src="/logo-data.js?v=11"></script>
+    <script>
+    (function () {
+        var pills = document.querySelectorAll('.filter-pill');
+        var search = document.getElementById('product-search');
+        var cards = document.querySelectorAll('.product-card');
+        var empty = document.getElementById('product-empty');
+        var activeFilter = 'all';
+
+        function applyFilters() {
+            var q = (search.value || '').trim().toLowerCase();
+            var visible = 0;
+            cards.forEach(function (card) {
+                var cat = card.getAttribute('data-category');
+                var hay = (card.getAttribute('data-search') || '') + ' ' + (card.querySelector('h3') ? card.querySelector('h3').textContent : '');
+                hay = hay.toLowerCase();
+                var matchCat = activeFilter === 'all' || cat === activeFilter;
+                var matchQ = !q || hay.indexOf(q) !== -1;
+                var show = matchCat && matchQ;
+                card.style.display = show ? '' : 'none';
+                if (show) visible++;
+            });
+            if (visible === 0) {
+                empty.hidden = false;
+            } else {
+                empty.hidden = true;
+            }
+        }
+
+        pills.forEach(function (pill) {
+            pill.addEventListener('click', function () {
+                pills.forEach(function (p) { p.classList.remove('active'); });
+                pill.classList.add('active');
+                activeFilter = pill.getAttribute('data-filter');
+                applyFilters();
+            });
+        });
+
+        search.addEventListener('input', applyFilters);
+    })();
+    </script>
+</body>
+</html>

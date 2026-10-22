@@ -1,7 +1,7 @@
 User-agent: *
 Allow: /
-Disallow: /admin.html
-Disallow: /dashboard.html
+Disallow: /admin/
+Disallow: /dashboard/
 Disallow: /discord-callback.html
 Disallow: /confirmed.html
 

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Vade - Discord</title>
-    <link rel="icon" type="image/png" href="NEW_VADE_LOGO-removebg-preview.png?v=10">
+    <link rel="icon" type="image/png" href="NEW_VADE_LOGO-removebg-preview.png?v=11">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Vade">
     <meta property="og:title" content="Vade - Discord">
@@ -16,13 +16,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=10">
+    <link rel="stylesheet" href="style.css?v=11">
 </head>
 <body class="login-body">
     <div class="login-grid-bg"></div>
     <main class="login-main fade-in-up">
         <div class="login-header">
-            <a href="index.html" class="logo">
+            <a href="/" class="logo">
                 <img src="" alt="Vade" class="logo-img" id="nav-logo">
             </a>
         </div>
@@ -32,8 +32,8 @@
         </div>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-    <script src="config.js?v=10"></script>
-    <script src="supabase-client.js?v=10"></script>
+    <script src="config.js?v=11"></script>
+    <script src="supabase-client.js?v=11"></script>
     <script>
     (async function () {
         var sb = window.supabaseClient;
@@ -45,7 +45,7 @@
 
         if (!session) {
             statusMsg.textContent = 'Not authenticated. Redirecting...';
-            window.location.href = 'login.html';
+            window.location.href = '/login/';
             return;
         }
 
@@ -53,7 +53,7 @@
 
         if (!providerToken) {
             statusMsg.textContent = 'No Discord token found. Trying login...';
-            window.location.href = 'login.html';
+            window.location.href = '/login/';
             return;
         }
 
@@ -85,17 +85,16 @@
                     return;
                 }
 
-                window.location.href = 'dashboard.html';
+                window.location.href = '/dashboard/';
             } else {
                 await sb.auth.signOut();
-                window.location.href = 'join-discord.html';
+                window.location.href = '/join-discord/';
             }
         } catch (e) {
             statusMsg.textContent = 'Error checking Discord. Please try again.';
         }
     })();
     </script>
-    <script src="logo-data.js?v=10"></script>
-    <script>if(window.VADE_LOGO){var el=document.getElementById('nav-logo');if(el)el.src=window.VADE_LOGO;}</script>
+    <script defer src="/logo-data.js?v=11"></script>
 </body>
 </html>
