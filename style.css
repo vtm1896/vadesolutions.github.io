@@ -2038,14 +2038,54 @@ section, .page-section {
     box-shadow: 0 0 14px rgba(139, 92, 246, 0.12);
 }
 
-/* ── Thin 30-day uptime strip (per product row) ── */
+/* ── 30-day uptime (thin strip + full product card) ── */
 .uptime-strip {
     display: flex;
     flex-direction: column;
-    gap: 7px;
-    margin-top: 12px;
+    gap: 8px;
+    margin-top: 10px;
     padding-top: 12px;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.uptime-strip.is-full {
+    margin-top: 0;
+    padding: 16px 18px 14px;
+    background: #0f0f0f;
+    border: 1px solid var(--border-color);
+    border-top: 1px solid var(--border-color);
+    border-radius: 12px;
+    gap: 12px;
+}
+
+.uptime-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.uptime-head-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
+.uptime-head-label svg {
+    color: var(--status-online);
+    opacity: 0.9;
+    flex-shrink: 0;
+}
+
+.uptime-strip .status-pill {
+    font-size: 0.68rem;
+    padding: 4px 10px;
+    gap: 6px;
 }
 
 .uptime-bars {
@@ -2054,15 +2094,26 @@ section, .page-section {
     height: 14px;
 }
 
+.uptime-strip.is-full .uptime-bars {
+    height: 26px;
+    gap: 3px;
+}
+
 .uptime-bars i {
     flex: 1;
     border-radius: 2px;
     min-width: 0;
+    position: relative;
     transition: transform 0.15s ease;
 }
 
+.uptime-strip.is-full .uptime-bars i {
+    border-radius: 4px;
+}
+
 .uptime-bars i:hover {
-    transform: scaleY(1.35);
+    transform: scaleY(1.3);
+    z-index: 60;
 }
 
 .uptime-bars i.u-up {
@@ -2081,7 +2132,58 @@ section, .page-section {
     background: rgba(255, 255, 255, 0.07);
 }
 
-.uptime-meta {
+/* Date tooltip on bar hover */
+.uptime-bars i::after {
+    content: attr(data-tip);
+    white-space: pre-line;
+    position: absolute;
+    bottom: calc(100% + 9px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    background: #16161a;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: var(--text-primary);
+    font-size: 0.7rem;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 1.5;
+    letter-spacing: 0.01em;
+    text-align: center;
+    padding: 7px 11px;
+    border-radius: 8px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    z-index: 80;
+    min-width: max-content;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
+}
+
+.uptime-bars i:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.uptime-bars i:first-child::after {
+    left: 0;
+    transform: translateX(0) translateY(4px);
+}
+
+.uptime-bars i:first-child:hover::after {
+    transform: translateX(0) translateY(0);
+}
+
+.uptime-bars i:last-child::after {
+    left: auto;
+    right: 0;
+    transform: translateX(0) translateY(4px);
+}
+
+.uptime-bars i:last-child:hover::after {
+    transform: translateX(0) translateY(0);
+}
+
+.uptime-foot {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -2091,21 +2193,38 @@ section, .page-section {
     flex-wrap: wrap;
 }
 
-.uptime-meta .uptime-pct {
+.uptime-foot-sub {
+    padding-top: 2px;
+}
+
+.uptime-pct {
     color: var(--status-online);
     font-weight: 600;
 }
 
-.uptime-meta .uptime-last {
+.uptime-updated {
+    color: #6a6a74;
     white-space: nowrap;
 }
 
-.uptime-meta .uptime-last strong {
+.uptime-body {
+    font-size: 0.78rem;
+    color: var(--text-primary);
+    font-weight: 500;
+    padding-top: 2px;
+}
+
+.uptime-body strong {
+    font-weight: 600;
+}
+
+.uptime-last strong {
     color: var(--text-primary);
     font-weight: 600;
 }
 
-.uptime-meta .uptime-last.is-down strong {
+.uptime-last.is-down,
+.uptime-last.is-down strong {
     color: var(--status-offline);
 }
 

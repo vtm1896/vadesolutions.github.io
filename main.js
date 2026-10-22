@@ -1,3 +1,106 @@
+// ── 30-day uptime engine (status strips + product cards) ──
+window.VadeUptime = (function () {
+    var DATA = {
+        'rust-internal': { uptime: '99.8%', lastDowntime: 'Oct 3 · 2h 10m', down: { 11: '2h 10m downtime' }, warn: {} },
+        'rust-external': { uptime: '96.4%', lastDowntime: 'Oct 20 · 5h 40m', down: { 12: '1h 15m downtime', 28: '5h 40m downtime' }, warn: {} },
+        'roblox-exec':   { uptime: '99.9%', lastDowntime: 'Oct 1 · 1h 05m',  down: { 9: '1h 05m downtime' }, warn: {} },
+        'roblox-ext':    { uptime: '100%',  lastDowntime: 'No downtime in past 30 days', down: {}, warn: {} }
+    };
+
+    var STATUS_TEXT = { online: 'All systems operational', offline: 'Currently unavailable', updating: 'Update in progress' };
+    var STATUS_LABEL = { online: 'Operational', offline: 'Offline', updating: 'Updating' };
+
+    function dayDate(i) {
+        var d = new Date();
+        d.setDate(d.getDate() - (29 - i));
+        return d;
+    }
+
+    function fmtDay(d) {
+        return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function fmtStamp(d) {
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) +
+            ', ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    }
+
+    function html(slug, status, variant) {
+        var info = DATA[slug] || { uptime: '—', lastDowntime: '—', down: {}, warn: {} };
+        status = status || 'online';
+        var full = variant === 'full';
+
+        var bars = '';
+        for (var i = 0; i < 30; i++) {
+            var cls = 'u-up';
+            var tipStatus = 'All systems operational';
+            if (i === 29) {
+                cls = status === 'offline' ? 'u-down' : status === 'updating' ? 'u-warn' : 'u-up';
+                tipStatus = STATUS_TEXT[status] || STATUS_TEXT.online;
+            } else if (info.down[i]) {
+                cls = 'u-down';
+                tipStatus = info.down[i];
+            } else if (info.warn[i]) {
+                cls = 'u-warn';
+                tipStatus = 'Degraded performance';
+            }
+            bars += '<i class="' + cls + '" data-tip="' + fmtDay(dayDate(i)) + '\n' + tipStatus + '"></i>';
+        }
+
+        var isDown = status === 'offline';
+        var last = isDown ? 'Ongoing downtime' : info.lastDowntime;
+        var now = new Date();
+
+        var head =
+            '<div class="uptime-head">' +
+                '<span class="uptime-head-label">' +
+                    '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>' +
+                    'Product status' +
+                '</span>' +
+                '<span class="status-pill ' + status + '"><span class="pill-dot"></span> ' + (STATUS_LABEL[status] || status) + '</span>' +
+            '</div>';
+
+        var barsEl = '<div class="uptime-bars">' + bars + '</div>';
+
+        var foot =
+            '<div class="uptime-foot">' +
+                '<span>Past 30 days · <span class="uptime-pct">' + info.uptime + ' uptime</span></span>' +
+                '<span class="uptime-updated">Updated ' + fmtStamp(now) + '</span>' +
+            '</div>';
+
+        var body = full
+            ? '<div class="uptime-body">' + (STATUS_TEXT[status] || STATUS_TEXT.online) +
+              (isDown ? '' : ' · Last downtime: <strong>' + last + '</strong>') + '</div>'
+            : '<div class="uptime-foot uptime-foot-sub">' +
+                '<span class="uptime-last' + (isDown ? ' is-down' : '') + '">Last downtime: <strong>' + last + '</strong></span>' +
+                '<span></span>' +
+              '</div>';
+
+        return head + barsEl + foot + body;
+    }
+
+    function hydrate() {
+        document.querySelectorAll('[data-uptime]').forEach(function (el) {
+            if (el.getAttribute('data-hydrated')) return;
+            el.setAttribute('data-hydrated', '1');
+            var slug = el.getAttribute('data-uptime');
+            var variant = el.getAttribute('data-uptime-variant') || 'full';
+            var status = el.getAttribute('data-uptime-status') || 'online';
+            el.innerHTML = html(slug, status, variant);
+
+            var sb = window.supabaseClient;
+            if (sb) {
+                sb.from('products').select('status').eq('slug', slug).single().then(function (res) {
+                    var st = res && res.data && res.data.status;
+                    if (st) el.innerHTML = html(slug, st, variant);
+                });
+            }
+        });
+    }
+
+    return { html: html, hydrate: hydrate, data: DATA, statusLabel: STATUS_LABEL };
+})();
+
 document.addEventListener('DOMContentLoaded', () => {
     // ── Scroll Animations ──
     const observer = new IntersectionObserver((entries, obs) => {
@@ -10,6 +113,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { root: null, rootMargin: '0px', threshold: 0.1 });
 
     document.querySelectorAll('.fade-in-up').forEach(el => observer.observe(el));
+
+    // ── Hydrate 30-day uptime cards ──
+    if (window.VadeUptime) window.VadeUptime.hydrate();
 
     // ── Mobile Nav: burger left of logo + left off-canvas panel ──
     const navbar = document.querySelector('.navbar');
