@@ -101,6 +101,70 @@ window.VadeUptime = (function () {
     return { html: html, hydrate: hydrate, data: DATA, statusLabel: STATUS_LABEL };
 })();
 
+// ── Dynamic pricing (plans pulled from products.prices) ──
+window.VadePricing = (function () {
+    function esc(s) {
+        return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+            return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+        });
+    }
+
+    function sync(rows, row) {
+        if (!row) return;
+        var price = row.getAttribute('data-price');
+        var link = row.getAttribute('data-link');
+        var btn = document.querySelector('.btn-buy-now');
+        var cart = document.querySelector('.btn-add-cart');
+        if (btn) {
+            btn.textContent = 'Buy Now — ' + price;
+            if (link) btn.href = link;
+        }
+        if (cart && link) cart.href = link;
+    }
+
+    function bind(rows) {
+        rows.addEventListener('click', function (e) {
+            var row = e.target.closest('.plan-row');
+            if (!row) return;
+            rows.querySelectorAll('.plan-row').forEach(function (r) { r.classList.remove('selected'); });
+            row.classList.add('selected');
+            sync(rows, row);
+        });
+    }
+
+    function apply(plans) {
+        var rows = document.querySelector('.plan-rows');
+        if (!rows || !plans || !plans.length) return;
+        rows.innerHTML = plans.map(function (p, i) {
+            var price = '$' + Number(p.price || 0).toFixed(2);
+            return '<div class="plan-row' + (i === 0 ? ' selected' : '') + '" data-price="' + esc(price) + '" data-link="' + esc(p.link || '') + '">' +
+                '<div class="plan-row-left">' +
+                    '<span class="plan-name">' + esc(p.name) + '</span>' +
+                    '<span class="plan-desc">' + esc(p.desc || '') + '</span>' +
+                '</div>' +
+                '<span class="plan-price">' + price + '</span>' +
+            '</div>';
+        }).join('');
+        sync(rows, rows.querySelector('.plan-row'));
+    }
+
+    function init() {
+        var rows = document.querySelector('.plan-rows');
+        var marker = document.querySelector('[data-uptime]');
+        if (!rows || !marker || !window.supabaseClient) return;
+        var slug = marker.getAttribute('data-uptime');
+        bind(rows);
+        window.supabaseClient
+            .from('products').select('prices').eq('slug', slug).single()
+            .then(function (res) {
+                var prices = res && res.data && res.data.prices;
+                if (prices && prices.length) apply(prices);
+            });
+    }
+
+    return { apply: apply, init: init };
+})();
+
 document.addEventListener('DOMContentLoaded', () => {
     // ── Scroll Animations ──
     const observer = new IntersectionObserver((entries, obs) => {
@@ -116,6 +180,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ── Hydrate 30-day uptime cards ──
     if (window.VadeUptime) window.VadeUptime.hydrate();
+
+    // ── Load DB pricing on product pages ──
+    if (window.VadePricing) window.VadePricing.init();
 
     // ── Mobile Nav: burger left of logo + left off-canvas panel ──
     const navbar = document.querySelector('.navbar');
