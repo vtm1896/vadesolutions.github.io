@@ -40,6 +40,23 @@
         .db-topbar h1 { font-size:0.9rem; font-weight:600; color:#fff; }
         .db-content { padding:32px 40px; display:flex; flex-direction:column; gap:24px; max-width:900px; width:100%; margin:0 auto; }
 
+        @media (max-width: 768px) {
+            body { flex-direction:column; }
+            .db-sidebar { position:sticky; top:0; left:auto; width:100%; height:auto; flex-direction:row; align-items:center; border-right:none; border-bottom:1px solid rgba(255,255,255,0.06); overflow-x:auto; }
+            .db-logo { padding:10px 14px; border-bottom:none; border-right:1px solid rgba(255,255,255,0.06); flex-shrink:0; }
+            .db-nav { flex-direction:row; padding:6px 8px; gap:4px; flex:1; overflow-x:auto; }
+            .db-nav-btn { white-space:nowrap; width:auto; padding:8px 12px; }
+            .db-divider { display:none; }
+            .db-footer { display:none; }
+            .db-main { margin-left:0; }
+            .db-content { padding:20px 16px; }
+        }
+        @media (max-width: 480px) {
+            .db-nav-btn span { display:none; }
+            .db-nav-btn { padding:10px; }
+            .db-topbar { padding:0 16px; }
+        }
+
         /* Cards */
         .db-card { background:#111; border:1px solid rgba(255,255,255,0.06); border-radius:12px; overflow:hidden; }
         .db-card-head { padding:20px 24px 0; }
@@ -234,8 +251,8 @@
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="config.js?v=2"></script>
-<script src="supabase-client.js?v=2"></script>
+<script src="config.js?v=4"></script>
+<script src="supabase-client.js?v=4"></script>
 <script>
 (async function () {
     var sb = window.supabaseClient;
@@ -469,7 +486,7 @@
     }
 })();
 </script>
-    <script src="logo-data.js?v=2"></script>
+    <script src="logo-data.js?v=4"></script>
     <script>if(window.VADE_LOGO){var el=document.getElementById('nav-logo');if(el)el.src=window.VADE_LOGO;}</script>
 
 </body>

@@ -11,6 +11,57 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.fade-in-up').forEach(el => observer.observe(el));
 
+    // ── Mobile Nav Drawer ──
+    const navbar = document.querySelector('.navbar');
+    const navContainer = document.querySelector('.nav-container');
+    if (navbar && navContainer) {
+        const links = navContainer.querySelector('.nav-links');
+        const actions = navContainer.querySelector('.nav-actions');
+        const drawer = document.createElement('div');
+        drawer.className = 'nav-drawer';
+        if (links) drawer.appendChild(links);
+        if (actions) drawer.appendChild(actions);
+        navContainer.appendChild(drawer);
+
+        const burger = document.createElement('button');
+        burger.className = 'nav-burger';
+        burger.setAttribute('aria-label', 'Open menu');
+        burger.setAttribute('aria-expanded', 'false');
+        burger.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>';
+        navContainer.appendChild(burger);
+
+        const isMobile = () => window.matchMedia('(max-width: 900px)').matches;
+
+        burger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const open = navbar.classList.toggle('nav-open');
+            burger.setAttribute('aria-expanded', open);
+        });
+
+        drawer.querySelectorAll('.dropdown > a').forEach(a => {
+            a.addEventListener('click', (e) => {
+                if (isMobile()) {
+                    e.preventDefault();
+                    a.parentElement.classList.toggle('open');
+                    return;
+                }
+                if (drawer.contains(a)) navbar.classList.remove('nav-open');
+            });
+        });
+
+        drawer.querySelectorAll('a:not(.dropdown > a)').forEach(a => {
+            a.addEventListener('click', () => navbar.classList.remove('nav-open'));
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!navbar.contains(e.target)) navbar.classList.remove('nav-open');
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') navbar.classList.remove('nav-open');
+        });
+    }
+
     // ── Smooth Scrolling for Anchor Links ──
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
