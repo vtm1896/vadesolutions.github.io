@@ -3041,6 +3041,158 @@ footer {
 }
 
 /* =========================================
+   Rate Us page (self-hosted reviews)
+========================================= */
+
+.rate-grid {
+    display: grid;
+    grid-template-columns: 400px 1fr;
+    gap: 22px;
+    align-items: start;
+    margin-top: 36px;
+}
+
+@media (max-width: 900px) {
+    .rate-grid { grid-template-columns: 1fr; }
+}
+
+.rate-card {
+    background: linear-gradient(160deg, #121212, #0d0d0d);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 24px;
+}
+
+.rate-card-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 18px;
+}
+
+.rate-agg {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #f59e0b;
+    white-space: nowrap;
+}
+
+.rate-guest p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 16px;
+}
+
+.rate-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.rate-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.rate-label .required { color: #ef4444; }
+
+.star-picker {
+    display: inline-flex;
+    gap: 4px;
+}
+
+.star-btn {
+    background: none;
+    border: none;
+    padding: 0 2px;
+    font-size: 2rem;
+    line-height: 1;
+    color: #3a3a3a;
+    cursor: pointer;
+    transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.star-btn:hover { transform: scale(1.12); }
+.star-btn.on { color: #f59e0b; }
+
+.rate-label-out {
+    margin-top: 6px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.rate-select,
+.rate-textarea {
+    width: 100%;
+    background: #0a0a0a;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    transition: var(--transition);
+}
+
+.rate-textarea { resize: vertical; min-height: 96px; line-height: 1.55; }
+
+.rate-select:focus,
+.rate-textarea:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.1);
+}
+
+.rate-hint {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    margin-top: 6px;
+}
+
+.rate-msg {
+    font-size: 0.85rem;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid;
+}
+
+.rate-msg.ok {
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.08);
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.rate-msg.bad {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+.rate-wall {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.rate-wall .feedback-card { flex: none; }
+
+.rate-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.88rem;
+    padding: 28px 12px;
+}
+
+/* =========================================
    Login Page (Morphine Theme)
 ========================================= */
 

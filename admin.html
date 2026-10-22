@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Vade - Admin Panel</title>
-    <link rel="icon" type="image/png" href="NEW_VADE_LOGO-removebg-preview.png?v=9">
+    <link rel="icon" type="image/png" href="NEW_VADE_LOGO-removebg-preview.png?v=10">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Vade">
     <meta property="og:title" content="Vade - Admin Panel">
@@ -16,7 +16,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=9">
+    <link rel="stylesheet" href="style.css?v=10">
     <style>
         .admin-shell { max-width: 1060px; margin: 0 auto; padding: 120px 20px 80px; }
 
@@ -172,6 +172,7 @@
         .data-left { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
         .data-title { font-weight: 600; font-size: 0.88rem; overflow: hidden; text-overflow: ellipsis; }
         .data-sub { font-size: 0.73rem; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; }
+        .rev-stars { color: #f59e0b; letter-spacing: 1px; }
         .data-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
         .data-amount { font-weight: 700; font-size: 0.92rem; font-variant-numeric: tabular-nums; }
         .mono { font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; }
@@ -294,6 +295,10 @@
                         <button class="admin-nav-btn" data-tab="licenses">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
                             Licenses
+                        </button>
+                        <button class="admin-nav-btn" data-tab="reviews">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            Reviews <span class="admin-nav-badge" id="nav-badge-reviews">—</span>
                         </button>
 
                         <div class="admin-nav-group">Admin</div>
@@ -632,6 +637,27 @@
                         </div>
                     </section>
 
+                    <!-- REVIEWS -->
+                    <section class="admin-panel" id="panel-reviews">
+                        <div class="admin-note">Published reviews appear live on the homepage marquee and the rate page. Hidden reviews disappear from the public but stay in the table — restore anytime. One review per user per product.</div>
+                        <div class="admin-card">
+                            <div class="admin-card-head">
+                                <div>
+                                    <div class="admin-card-title">All reviews</div>
+                                    <div class="admin-card-sub" id="rev-count">—</div>
+                                </div>
+                                <div class="staff-toolbar" style="margin-bottom:0;">
+                                    <select class="admin-select" id="rev-filter" aria-label="Filter reviews">
+                                        <option value="all">All statuses</option>
+                                        <option value="published">Published</option>
+                                        <option value="hidden">Hidden</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div id="rev-list"><div class="admin-empty">Loading…</div></div>
+                        </div>
+                    </section>
+
                     <!-- AUDIT LOG -->
                     <section class="admin-panel" id="panel-audit">
                         <div class="admin-note">Every admin action writes here — status flips, role changes, prices, orders, coupons, keys. Newest first, last 100 entries.</div>
@@ -770,11 +796,11 @@
     <div class="admin-toast" id="admin-toast"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-    <script src="config.js?v=9"></script>
-    <script src="supabase-client.js?v=9"></script>
-    <script src="auth-roles.js?v=9"></script>
-    <script src="main.js?v=9"></script>
-    <script src="logo-data.js?v=9"></script>
+    <script src="config.js?v=10"></script>
+    <script src="supabase-client.js?v=10"></script>
+    <script src="auth-roles.js?v=10"></script>
+    <script src="main.js?v=10"></script>
+    <script src="logo-data.js?v=10"></script>
     <script>if(window.VADE_LOGO){var el=document.getElementById('nav-logo');if(el)el.src=window.VADE_LOGO;}</script>
     <script>
     (function () {
@@ -854,6 +880,7 @@
             orders:    { t: 'Orders & Sales', s: 'Track revenue and manually log purchases.' },
             coupons:   { t: 'Coupons', s: 'Create and manage discount codes.' },
             licenses:  { t: 'License Keys', s: 'Create, check, and revoke KeyAuth licenses.' },
+            reviews:   { t: 'Reviews', s: 'Moderate community star reviews shown on the homepage and rate page.' },
             audit:     { t: 'Audit Log', s: 'Every admin action, newest first.' },
             staff:     { t: 'Users & Roles', s: 'Manage staff access and role assignments.' }
         };
@@ -881,6 +908,7 @@
             if (name === 'orders') loadOrders();
             if (name === 'coupons') loadCoupons();
             if (name === 'licenses') loadLicenses();
+            if (name === 'reviews') loadReviews();
             if (name === 'audit') loadAudit();
         }
 
@@ -1809,6 +1837,83 @@
         document.getElementById('lookup-find').addEventListener('click', doLookup);
         document.getElementById('lookup-input').addEventListener('keydown', function (e) { if (e.key === 'Enter') doLookup(); });
 
+        // ── Reviews ──
+        var reviewsCache = [];
+        var reviewsErrored = false;
+
+        async function loadReviews() {
+            var { data, error } = await sb
+                .from('reviews')
+                .select('id, author_id, author_name, product_slug, rating, body, status, created_at')
+                .order('created_at', { ascending: false });
+            reviewsErrored = !!error;
+            reviewsCache = error ? [] : (data || []);
+            var badge = document.getElementById('nav-badge-reviews');
+            if (badge) badge.textContent = reviewsCache.length;
+            renderReviews();
+        }
+
+        function renderReviews() {
+            var wrap = document.getElementById('rev-list');
+            if (reviewsErrored) { wrap.innerHTML = '<div class="admin-empty">Could not load reviews — run admin-setup-v3.sql.</div>'; return; }
+
+            var filter = document.getElementById('rev-filter').value;
+            var rows = reviewsCache.filter(function (r) { return filter === 'all' || r.status === filter; });
+
+            var pub = reviewsCache.filter(function (r) { return r.status === 'published'; });
+            var avg = pub.length ? (pub.reduce(function (s, r) { return s + (r.rating || 0); }, 0) / pub.length) : 0;
+            document.getElementById('rev-count').textContent =
+                reviewsCache.length + ' total · ' + pub.length + ' published · avg ★' + (pub.length ? avg.toFixed(1) : '—');
+
+            if (!rows.length) { wrap.innerHTML = '<div class="admin-empty">' + (reviewsCache.length ? 'Nothing matches this filter.' : 'No reviews yet.') + '</div>'; return; }
+
+            wrap.innerHTML = rows.map(function (r) {
+                var starStr = '';
+                for (var i = 1; i <= 5; i++) starStr += i <= r.rating ? '★' : '☆';
+                var d = new Date(r.created_at);
+                var when = isNaN(d) ? '' : d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+                var hidden = r.status === 'hidden';
+                return '<div class="data-row" data-id="' + esc(r.id) + '">' +
+                    '<div class="data-left">' +
+                        '<span class="data-title"><span class="rev-stars">' + starStr + '</span> ' + esc(r.author_name) + '</span>' +
+                        '<span class="data-sub">' + esc(window.VadeReviews ? window.VadeReviews.label(r.product_slug) : (r.product_slug || 'Vade')) + (when ? ' · ' + esc(when) : '') + ' — ' + esc(r.body) + '</span>' +
+                    '</div>' +
+                    '<div class="data-right">' +
+                        '<span class="tag ' + (hidden ? 'neutral' : 'active') + '">' + (hidden ? 'hidden' : 'published') + '</span>' +
+                        '<button type="button" class="admin-btn ghost sm rev-toggle">' + (hidden ? 'Restore' : 'Hide') + '</button>' +
+                        '<button type="button" class="admin-btn danger sm rev-del">Delete</button>' +
+                    '</div>' +
+                '</div>';
+            }).join('');
+
+            wrap.querySelectorAll('.rev-toggle').forEach(function (btn) {
+                btn.addEventListener('click', async function () {
+                    var id = btn.closest('.data-row').getAttribute('data-id');
+                    var r = reviewsCache.find(function (x) { return x.id === id; });
+                    if (!r) return;
+                    btn.disabled = true;
+                    var next = r.status === 'hidden' ? 'published' : 'hidden';
+                    var { error } = await sb.from('reviews').update({ status: next }).eq('id', id);
+                    btn.disabled = false;
+                    if (error) { toast('Update failed: ' + error.message, true); return; }
+                    audit('review', r.author_name, next === 'hidden' ? 'review hidden' : 'review restored');
+                    loadReviews();
+                });
+            });
+            wrap.querySelectorAll('.rev-del').forEach(function (btn) {
+                btn.addEventListener('click', async function () {
+                    var id = btn.closest('.data-row').getAttribute('data-id');
+                    var r = reviewsCache.find(function (x) { return x.id === id; });
+                    btn.disabled = true;
+                    var { error } = await sb.from('reviews').delete().eq('id', id);
+                    if (error) { toast('Delete failed: ' + error.message, true); btn.disabled = false; return; }
+                    audit('review', r ? r.author_name : id, 'review deleted');
+                    loadReviews();
+                });
+            });
+        }
+        document.getElementById('rev-filter').addEventListener('change', renderReviews);
+
         // ── Audit log ──
         var auditCache = [];
 
@@ -1899,6 +2004,7 @@
             await loadProducts();
             await loadChangelogs();
             await fetchUsers();
+            loadReviews();
             renderOverview();
 
             var initial = location.hash.slice(1);

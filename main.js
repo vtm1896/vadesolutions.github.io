@@ -165,6 +165,100 @@ window.VadePricing = (function () {
     return { apply: apply, init: init };
 })();
 
+// ── Reviews (self-hosted star reviews → homepage marquee + rate page) ──
+window.VadeReviews = (function () {
+    var PRODUCTS = {
+        'rust-internal': 'Rust Internal',
+        'rust-external': 'Rust External',
+        'roblox-exec':   'Vade Executor',
+        'roblox-ext':    'Roblox External',
+        '':              'Vade'
+    };
+
+    function esc(s) {
+        return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+            return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+        });
+    }
+
+    function stars(n) {
+        n = parseInt(n, 10) || 0;
+        var out = '';
+        for (var i = 1; i <= 5; i++) out += i <= n ? '★' : '☆';
+        return out;
+    }
+
+    function label(slug) {
+        return PRODUCTS[slug == null ? '' : slug] || slug || 'Vade';
+    }
+
+    function initial(name) {
+        var s = String(name || '?').trim();
+        return s ? s.charAt(0).toUpperCase() : '?';
+    }
+
+    function quote(s, max) {
+        s = String(s == null ? '' : s).trim();
+        if (max && s.length > max) s = s.slice(0, max).replace(/\s+\S*$/, '') + '…';
+        return s;
+    }
+
+    function card(r, hidden) {
+        return '<div class="feedback-card"' + (hidden ? ' aria-hidden="true"' : '') + '>' +
+            '<div class="feedback-stars">' + stars(r.rating) + '</div>' +
+            '<p>&ldquo;' + esc(quote(r.body, 170)) + '&rdquo;</p>' +
+            '<div class="feedback-meta">' +
+                '<span class="feedback-avatar">' + esc(initial(r.author_name)) + '</span>' +
+                '<div><strong>' + esc(r.author_name) + '</strong><small>' + esc(label(r.product_slug)) + '</small></div>' +
+            '</div>' +
+        '</div>';
+    }
+
+    function tile(r) {
+        var d = new Date(r.created_at);
+        var when = isNaN(d) ? '' : d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+        return '<div class="feedback-card">' +
+            '<div class="feedback-stars">' + stars(r.rating) + '</div>' +
+            '<p>&ldquo;' + esc(quote(r.body, 320)) + '&rdquo;</p>' +
+            '<div class="feedback-meta">' +
+                '<span class="feedback-avatar">' + esc(initial(r.author_name)) + '</span>' +
+                '<div><strong>' + esc(r.author_name) + '</strong><small>' + esc(label(r.product_slug)) + (when ? ' · ' + esc(when) : '') + '</small></div>' +
+            '</div>' +
+        '</div>';
+    }
+
+    function published() {
+        if (!window.supabaseClient) return Promise.resolve({ data: null, error: new Error('no client') });
+        return window.supabaseClient
+            .from('reviews')
+            .select('author_name, product_slug, rating, body, created_at')
+            .eq('status', 'published')
+            .order('created_at', { ascending: false })
+            .limit(12);
+    }
+
+    function fillMarquee() {
+        var track = document.querySelector('.feedback-track');
+        if (!track) return;
+        published().then(function (res) {
+            if (res.error || !res.data || !res.data.length) return;
+            track.innerHTML = res.data.map(function (r) { return card(r, false); }).join('') +
+                res.data.map(function (r) { return card(r, true); }).join('');
+        }).catch(function () {});
+    }
+
+    function init() { fillMarquee(); }
+
+    return {
+        init: init,
+        stars: stars,
+        esc: esc,
+        label: label,
+        tile: tile,
+        published: published
+    };
+})();
+
 document.addEventListener('DOMContentLoaded', () => {
     // ── Scroll Animations ──
     const observer = new IntersectionObserver((entries, obs) => {
@@ -183,6 +277,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ── Load DB pricing on product pages ──
     if (window.VadePricing) window.VadePricing.init();
+
+    // ── Live review cards in the homepage marquee ──
+    if (window.VadeReviews) window.VadeReviews.init();
 
     // ── Mobile Nav: burger left of logo + left off-canvas panel ──
     const navbar = document.querySelector('.navbar');

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Vade - Rate Us</title>
-    <link rel="icon" type="image/png" href="NEW_VADE_LOGO-removebg-preview.png?v=9">
+    <link rel="icon" type="image/png" href="NEW_VADE_LOGO-removebg-preview.png?v=10">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Vade">
     <meta property="og:title" content="Vade - Rate Us">
@@ -18,7 +18,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="style.css?v=9">
+    <link rel="stylesheet" href="style.css?v=10">
 </head>
 <body>
     <nav class="navbar">
@@ -54,11 +54,69 @@
     </nav>
 
     <section class="page-section first">
-        <div class="container generic-content fade-in-up">
-            <h2>Rate Our Services</h2>
-            <p>We'd love to hear your feedback. Please leave a review on our Trustpilot or in our Discord server.</p>
-            <br>
-            <a href="#" class="btn btn-primary btn-large">Review on Trustpilot</a>
+        <div class="container">
+            <div class="section-header fade-in-up" style="text-align:center;">
+                <h2>Rate Our Services</h2>
+                <p>Star rating and honest words, straight from the community. Reviews show live on our homepage.</p>
+            </div>
+
+            <div class="rate-grid fade-in-up" style="transition-delay: 0.05s;">
+                <!-- Write a review -->
+                <div class="rate-card">
+                    <div class="rate-card-title">Leave a review</div>
+
+                    <div id="rate-guest" class="rate-guest" hidden>
+                        <p>Sign in with Discord to post a review — it keeps the wall clean.</p>
+                        <a href="login.html" class="btn btn-primary">Sign in to review</a>
+                    </div>
+
+                    <form id="rate-form" class="rate-form" hidden>
+                        <div class="rate-field">
+                            <label class="rate-label">Your rating <span class="required">*</span></label>
+                            <div class="star-picker" id="star-picker" role="radiogroup" aria-label="Star rating">
+                                <button type="button" class="star-btn" data-v="1" aria-label="1 star">&#9733;</button>
+                                <button type="button" class="star-btn" data-v="2" aria-label="2 stars">&#9733;</button>
+                                <button type="button" class="star-btn" data-v="3" aria-label="3 stars">&#9733;</button>
+                                <button type="button" class="star-btn" data-v="4" aria-label="4 stars">&#9733;</button>
+                                <button type="button" class="star-btn" data-v="5" aria-label="5 stars">&#9733;</button>
+                            </div>
+                            <div class="rate-label-out" id="rate-label-out">Tap to rate</div>
+                        </div>
+
+                        <div class="rate-field">
+                            <label class="rate-label" for="rate-product">Product</label>
+                            <select id="rate-product" class="rate-select">
+                                <option value="">Vade (general)</option>
+                                <option value="rust-internal">Rust Internal</option>
+                                <option value="rust-external">Rust External</option>
+                                <option value="roblox-exec">Vade Executor</option>
+                                <option value="roblox-ext">Roblox External</option>
+                            </select>
+                        </div>
+
+                        <div class="rate-field">
+                            <label class="rate-label" for="rate-body">Your review <span class="required">*</span></label>
+                            <textarea id="rate-body" class="rate-textarea" rows="4" minlength="10" maxlength="600"
+                                placeholder="What worked well? Anything we should fix?"></textarea>
+                            <div class="rate-hint"><span id="rate-count">0</span>/600 · minimum 10 characters</div>
+                        </div>
+
+                        <div class="rate-msg" id="rate-msg" hidden></div>
+                        <button type="submit" class="btn btn-primary btn-large" id="rate-submit">Post review</button>
+                    </form>
+                </div>
+
+                <!-- Live wall -->
+                <div class="rate-card">
+                    <div class="rate-card-title">
+                        Latest reviews
+                        <span class="rate-agg" id="rate-agg"></span>
+                    </div>
+                    <div class="rate-wall" id="rate-wall">
+                        <div class="rate-empty" id="rate-wall-empty">No reviews yet — yours could be first.</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -76,11 +134,153 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-    <script src="config.js?v=9"></script>
-    <script src="supabase-client.js?v=9"></script>
-    <script src="auth-roles.js?v=9"></script>
-    <script src="main.js?v=9"></script>
-    <script src="logo-data.js?v=9"></script>
+    <script src="config.js?v=10"></script>
+    <script src="supabase-client.js?v=10"></script>
+    <script src="auth-roles.js?v=10"></script>
+    <script src="main.js?v=10"></script>
+    <script src="logo-data.js?v=10"></script>
     <script>if(window.VADE_LOGO){var el=document.getElementById('nav-logo');if(el)el.src=window.VADE_LOGO;}</script>
+    <script>
+    (function () {
+        var R = window.VadeRoles;
+        var REV = window.VadeReviews;
+        if (!REV || !R || !window.supabaseClient) return;
+        var sb = window.supabaseClient;
+
+        var rating = 0;
+        var me = null;
+        var submitting = false;
+
+        var RATE_WORDS = ['', 'We’re sorry to hear that', 'Not great', 'It’s okay', 'Good stuff', 'Excellent — thank you!'];
+
+        // ── Wall ──
+        async function loadWall() {
+            var { data, error } = await sb
+                .from('reviews')
+                .select('author_name, product_slug, rating, body, created_at')
+                .eq('status', 'published')
+                .order('created_at', { ascending: false })
+                .limit(30);
+            var wall = document.getElementById('rate-wall');
+            var empty = document.getElementById('rate-wall-empty');
+            var agg = document.getElementById('rate-agg');
+            if (error || !data || !data.length) {
+                wall.querySelectorAll('.feedback-card').forEach(function (c) { c.remove(); });
+                empty.style.display = '';
+                agg.textContent = '';
+                return;
+            }
+            empty.style.display = 'none';
+            var avg = data.reduce(function (s, r) { return s + (r.rating || 0); }, 0) / data.length;
+            agg.textContent = '★ ' + avg.toFixed(1) + ' · ' + data.length + ' review' + (data.length === 1 ? '' : 's');
+            var html = data.map(function (r) { return REV.tile(r); }).join('');
+            wall.querySelectorAll('.feedback-card').forEach(function (c) { c.remove(); });
+            wall.insertAdjacentHTML('afterbegin', html);
+        }
+
+        // ── Star picker ──
+        var picker = document.getElementById('star-picker');
+        var btns = picker ? Array.prototype.slice.call(picker.querySelectorAll('.star-btn')) : [];
+
+        function paint(n) {
+            btns.forEach(function (b, i) { b.classList.toggle('on', i < n); });
+        }
+
+        btns.forEach(function (b) {
+            var v = parseInt(b.getAttribute('data-v'), 10);
+            b.addEventListener('mouseenter', function () { paint(v); });
+            b.addEventListener('click', function () {
+                rating = v;
+                paint(v);
+                document.getElementById('rate-label-out').textContent = RATE_WORDS[v];
+            });
+        });
+        if (picker) {
+            picker.addEventListener('mouseleave', function () { paint(rating); });
+        }
+
+        // ── Char count ──
+        var body = document.getElementById('rate-body');
+        var count = document.getElementById('rate-count');
+        if (body) {
+            body.addEventListener('input', function () { count.textContent = body.value.length; });
+        }
+
+        // ── Message helper ──
+        function msg(text, bad) {
+            var el = document.getElementById('rate-msg');
+            if (!text) { el.hidden = true; return; }
+            el.hidden = false;
+            el.textContent = text;
+            el.className = 'rate-msg' + (bad ? ' bad' : ' ok');
+        }
+
+        // ── Submit ──
+        var form = document.getElementById('rate-form');
+        if (form) {
+            form.addEventListener('submit', async function (e) {
+                e.preventDefault();
+                if (submitting) return;
+
+                var text = (body.value || '').trim();
+                if (!rating) { msg('Pick a star rating first.', true); return; }
+                if (text.length < 10) { msg('Review needs at least 10 characters.', true); return; }
+
+                submitting = true;
+                var btn = document.getElementById('rate-submit');
+                btn.disabled = true;
+                btn.textContent = 'Posting…';
+                msg('');
+
+                var slug = document.getElementById('rate-product').value || null;
+                var { error } = await sb.from('reviews').insert({
+                    author_id: me.id,
+                    author_name: me.username || 'Vade user',
+                    product_slug: slug,
+                    rating: rating,
+                    body: text
+                });
+
+                submitting = false;
+                btn.disabled = false;
+                btn.textContent = 'Post review';
+
+                if (error) {
+                    if (error.code === '23505') {
+                        msg('You’ve already reviewed this product — one review per product.', true);
+                    } else {
+                        msg('Could not post: ' + error.message, true);
+                    }
+                    return;
+                }
+
+                form.reset();
+                rating = 0;
+                paint(0);
+                count.textContent = '0';
+                document.getElementById('rate-label-out').textContent = 'Tap to rate';
+                msg('Review posted — thanks for the feedback!', false);
+                loadWall();
+            });
+        }
+
+        // ── Auth gate ──
+        async function gate() {
+            me = await R.getProfile().catch(function () { return null; });
+            var guest = document.getElementById('rate-guest');
+            var formEl = document.getElementById('rate-form');
+            if (me) {
+                guest.hidden = true;
+                formEl.hidden = false;
+            } else {
+                guest.hidden = false;
+                formEl.hidden = true;
+            }
+            loadWall();
+        }
+
+        gate();
+    })();
+    </script>
 </body>
 </html>
