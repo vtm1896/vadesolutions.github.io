@@ -11,54 +11,84 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.fade-in-up').forEach(el => observer.observe(el));
 
-    // ── Mobile Nav Drawer ──
+    // ── Mobile Nav: burger left of logo + left off-canvas panel ──
     const navbar = document.querySelector('.navbar');
     const navContainer = document.querySelector('.nav-container');
     if (navbar && navContainer) {
         const links = navContainer.querySelector('.nav-links');
         const actions = navContainer.querySelector('.nav-actions');
+
+        const isMobile = () => window.matchMedia('(max-width: 900px)').matches;
+
         const drawer = document.createElement('div');
         drawer.className = 'nav-drawer';
         if (links) drawer.appendChild(links);
         if (actions) drawer.appendChild(actions);
         navContainer.appendChild(drawer);
 
+        const panel = document.createElement('aside');
+        panel.className = 'nav-panel';
+        panel.setAttribute('aria-label', 'Menu');
+        panel.appendChild(drawer);
+
+        const overlay = document.createElement('div');
+        overlay.className = 'nav-overlay';
+
         const burger = document.createElement('button');
         burger.className = 'nav-burger';
         burger.setAttribute('aria-label', 'Open menu');
         burger.setAttribute('aria-expanded', 'false');
         burger.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>';
-        navContainer.appendChild(burger);
+        navContainer.insertBefore(burger, navContainer.firstChild);
+        document.body.appendChild(panel);
+        document.body.appendChild(overlay);
 
-        const isMobile = () => window.matchMedia('(max-width: 900px)').matches;
+        const setOpen = (open) => {
+            panel.classList.toggle('open', open);
+            overlay.classList.toggle('open', open);
+            navbar.classList.toggle('nav-open', open);
+            burger.setAttribute('aria-expanded', open);
+            document.body.style.overflow = open ? 'hidden' : '';
+        };
+
+        const place = () => {
+            if (isMobile()) {
+                panel.appendChild(drawer);
+            } else {
+                navContainer.appendChild(drawer);
+                setOpen(false);
+            }
+        };
+        place();
+        window.matchMedia('(max-width: 900px)').addEventListener('change', place);
 
         burger.addEventListener('click', (e) => {
             e.stopPropagation();
-            const open = navbar.classList.toggle('nav-open');
-            burger.setAttribute('aria-expanded', open);
+            setOpen(!panel.classList.contains('open'));
         });
+
+        overlay.addEventListener('click', () => setOpen(false));
 
         drawer.querySelectorAll('.dropdown > a').forEach(a => {
             a.addEventListener('click', (e) => {
                 if (isMobile()) {
                     e.preventDefault();
                     a.parentElement.classList.toggle('open');
-                    return;
                 }
-                if (drawer.contains(a)) navbar.classList.remove('nav-open');
             });
         });
 
-        drawer.querySelectorAll('a:not(.dropdown > a)').forEach(a => {
-            a.addEventListener('click', () => navbar.classList.remove('nav-open'));
+        drawer.querySelectorAll('a').forEach(a => {
+            if (a.parentElement && a.parentElement.classList.contains('dropdown')) return;
+            a.addEventListener('click', () => setOpen(false));
         });
 
         document.addEventListener('click', (e) => {
-            if (!navbar.contains(e.target)) navbar.classList.remove('nav-open');
+            if (!navbar.contains(e.target) && !panel.contains(e.target)) setOpen(false);
         });
 
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') navbar.classList.remove('nav-open');
+            if (e.key === 'Escape') setOpen(false);
         });
     }
 

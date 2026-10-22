@@ -2493,6 +2493,44 @@ footer {
     margin-bottom: 20px;
 }
 
+/* ── Mobile Nav Burger + Off-canvas Panel (base = desktop) ── */
+.nav-drawer {
+    display: contents;
+}
+
+.nav-panel,
+.nav-overlay {
+    display: none;
+}
+
+.nav-burger {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    color: var(--text-primary);
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-right: 4px;
+    padding: 0;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.nav-burger:hover {
+    background: rgba(255,255,255,0.09);
+    border-color: rgba(255,255,255,0.18);
+}
+
+.navbar.nav-open .nav-burger {
+    background: rgba(139, 92, 246, 0.15);
+    border-color: rgba(139, 92, 246, 0.45);
+    color: var(--accent-color);
+}
+
 /* Responsive */
 @media (max-width: 1100px) {
     .product-page-layout {
@@ -2511,35 +2549,49 @@ footer {
         grid-template-columns: repeat(2, 1fr);
     }
 
-    /* ── Mobile nav takeover ── */
-    .navbar {
-        width: calc(100% - 24px);
-        max-width: none;
-    }
-
+    /* ── Mobile: left off-canvas panel ── */
     .nav-burger {
         display: flex;
     }
 
-    .nav-drawer {
-        display: none;
-        position: absolute;
-        top: calc(100% + 8px);
-        left: 0;
-        right: 0;
+    .nav-panel {
+        display: flex;
         flex-direction: column;
-        gap: 4px;
-        background: #111;
-        border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 14px;
-        padding: 10px;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.7);
-        max-height: calc(100vh - 90px);
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: min(320px, 86vw);
+        background: #0d0d0d;
+        border-right: 1px solid rgba(255,255,255,0.08);
+        z-index: 100001;
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 84px 16px 28px;
         overflow-y: auto;
+        box-shadow: 0 0 50px rgba(0,0,0,0.8);
     }
 
-    .navbar.nav-open .nav-drawer {
-        display: flex;
+    .nav-panel.open {
+        transform: translateX(0);
+    }
+
+    .nav-overlay {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
+        backdrop-filter: blur(2px);
+        -webkit-backdrop-filter: blur(2px);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+        z-index: 100000;
+    }
+
+    .nav-overlay.open {
+        opacity: 1;
+        pointer-events: auto;
     }
 
     .nav-drawer .nav-links {
@@ -3281,33 +3333,6 @@ footer {
 
 .user-dropdown-logout:hover svg {
     opacity: 1;
-}
-
-/* ── Mobile Nav Burger + Drawer (base = desktop) ── */
-.nav-drawer {
-    display: contents;
-}
-
-.nav-burger {
-    display: none;
-    align-items: center;
-    justify-content: center;
-    width: 38px;
-    height: 38px;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    color: var(--text-primary);
-    cursor: pointer;
-    flex-shrink: 0;
-    margin-left: 6px;
-    padding: 0;
-    transition: background 0.2s, border-color 0.2s;
-}
-
-.nav-burger:hover {
-    background: rgba(255,255,255,0.09);
-    border-color: rgba(255,255,255,0.18);
 }
 
 .nav-burger:focus-visible {
