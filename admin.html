@@ -1657,8 +1657,9 @@
                 },
                 body: JSON.stringify(body)
             });
-            if (!res.ok) throw new Error('Proxy HTTP ' + res.status);
-            return res.json();
+            var out = await res.json().catch(function () { return {}; });
+            if (!res.ok || out.success === false) throw new Error(out.error || ('Proxy HTTP ' + res.status));
+            return out;
         }
 
         function licSetupState() {

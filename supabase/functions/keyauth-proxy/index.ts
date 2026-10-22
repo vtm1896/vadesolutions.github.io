@@ -36,11 +36,22 @@ async function ka(fields: Record<string, string>): Promise<Record<string, unknow
   const payload = new URLSearchParams({ name: KA_NAME, ownerid: KA_OWNER, ...fields });
   const res = await fetch(KA_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+      "Accept": "application/json, text/plain, */*",
+      "Accept-Language": "en-US,en;q=0.9",
+    },
     body: payload.toString(),
   });
-  if (!res.ok) throw new Error(`KeyAuth HTTP ${res.status}`);
-  return await res.json();
+  const text = await res.text();
+  if (!res.ok) throw new Error(`KeyAuth HTTP ${res.status}: ${text.slice(0, 300)}`);
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error(`KeyAuth returned non-JSON: ${text.slice(0, 300)}`);
+  }
 }
 
 function kaError(data: Record<string, unknown>): string {
@@ -94,27 +105,37 @@ async function assertStaff(req: Request): Promise<string | null> {
 }
 
 async function initSession(): Promise<string> {
-  const data = await ka({ action: "init", ver: VER });
-  if (data.success !== true && data.success !== "true") {
-    throw new Error(data.sessionid ? kaError(data) : "KeyAuth init failed: " + kaError(data));
+  let data: Record<string, unknown>;
+  try {
+    data = await ka({ action: "init", ver: VER });
+  } catch (e) {
+    throw new Error("init failed: " + (e as Error).message);
   }
-  return String(data.sessionid);
+  if (data.success !== true && data.success !== "true") {
+    throw new Error("init rejected: " + kaError(data));
+  }
+  return String(data.sessionid ?? data.token);
 }
 
 async function adminSession(): Promise<{ session: string; auth: string }> {
   const session = await initSession();
-  const data = await ka({
-    action: "login",
-    username: KA_USER,
-    pass: KA_PASS,
-    sessionid: session,
-  });
+  let data: Record<string, unknown>;
+  try {
+    data = await ka({
+      action: "login",
+      username: KA_USER,
+      pass: KA_PASS,
+      sessionid: session,
+    });
+  } catch (e) {
+    throw new Error("admin login transport error: " + (e as Error).message);
+  }
   if (data.success !== true && data.success !== "true") {
-    throw new Error("KeyAuth admin login failed: " + kaError(data));
+    throw new Error("admin login rejected: " + kaError(data));
   }
   return {
     session: String(data.sessionid ?? session),
-    auth: String(data.authentification ?? ""),
+    auth: String(data.authentification ?? data.token ?? ""),
   };
 }
 
@@ -137,9 +158,9 @@ async function handleCreate(count: number, prefix: string) {
         mask: "1",
       });
       if (data.success === true || data.success === "true") keys.push(key);
-      else errors.push(kaError(data));
+      else errors.push(`add rejected: ${kaError(data)}`);
     } catch (e) {
-      errors.push(String((e as Error).message));
+      errors.push(`add transport: ${(e as Error).message}`);
     }
   }
   if (!keys.length) throw new Error(errors[0] ?? "KeyAuth created nothing");
